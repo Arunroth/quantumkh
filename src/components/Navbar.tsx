@@ -12,12 +12,12 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white/80 dark:bg-dark-900/80 backdrop-blur-md fixed w-full z-50 shadow-sm transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-2 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <img src={logoImage} alt="Company Logo" className="h-10 w-auto" />
-              <span className="text-xl font-bold text-dark-900 dark:text-white">Quantum Engineering & Manufacturing</span>
+              <img src={logoImage} alt="Company Logo" className="h-12 md:h-10 w-auto" />
+              <span className="hidden md:inline text-xl font-bold text-dark-900 dark:text-white">Quantum Engineering & Manufacturing</span>
             </Link>
           </div>
           
