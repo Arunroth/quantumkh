@@ -1,0 +1,28 @@
+{
+  "features": [
+    {
+      "id": "1",
+      "name": "Advance Technology",
+      "description": "State-of-the-art machinery for precise manufacturing",
+      "icon": "Settings"
+    },
+    {
+      "id": "2",
+      "name": "Rapid Production",
+      "description": "24-hour turnaround available for urgent projects",
+      "icon": "Clock"
+    },
+    {
+      "id": "3",
+      "name": "Quality Control",
+      "description": "Rigorous testing and inspection protocols",
+      "icon": "Shield"
+    },
+    {
+      "id": "4",
+      "name": "Smart Pricing",
+      "description": "Competitive rates with instant quote generation",
+      "icon": "Zap"
+    }
+  ]
+}

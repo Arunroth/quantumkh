@@ -1,0 +1,14 @@
+{
+  "clients": [
+    {
+      "id": "1",
+      "name": "NN. C. X. CO., LTD,",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Honda_Logo.svg/1200px-Honda_Logo.svg.png",
+      "industry": "Motorcycle industry",
+      "type": "Manufacturing",
+      "testimonial": "",
+      "author": "",
+      "role": ""
+    }
+  ]
+}

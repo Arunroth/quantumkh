@@ -1,0 +1,15 @@
+{
+  "machines": [
+    {
+      "id": "1",
+      "name": "HAAS VF33",
+      "type": "CNC Vertical Machining Center",
+      "image": "https://images.unsplash.com/photo-1565962768804-b667f1d18a55?auto=format&fit=crop&q=80",
+      "workspace": "40\" x 20\" x 25\"",
+      "speed": "12,000 RPM",
+      "accuracy": "±0.0002\"",
+      "materials": "Metals, Plastics",
+      "description": "High-speed vertical machining center perfect for precision parts manufacturing."
+    }
+  ]
+}

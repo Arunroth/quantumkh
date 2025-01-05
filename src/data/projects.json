@@ -1,0 +1,13 @@
+{
+  "projects": [
+    {
+      "id": "1",
+      "title": "Custom CNC Machined Components",
+      "client": "Automotive Manufacturing",
+      "description": "Precision-engineered drivetrain components with tight tolerances for a leading automotive manufacturer.",
+      "image": "https://images.unsplash.com/photo-1565962768804-b667f1d18a55?auto=format&fit=crop&q=80",
+      "category": "Automotive",
+      "completion": "2024"
+    }
+  ]
+}
