@@ -101,7 +101,7 @@ export default function ServicesEditor() {
                   <img
                     src={service.image}
                     alt={service.name}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-48 object-contain"
                   />
                 </div>
                 <div className="p-4">

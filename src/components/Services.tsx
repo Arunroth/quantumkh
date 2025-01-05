@@ -25,7 +25,7 @@ export default function Services() {
                 <img
                   src={service.image}
                   alt={service.name}
-                  className="object-cover w-full h-48 group-hover:scale-105 transition-transform duration-300 mix-blend-normal dark:filter-none"
+                  className="object-contain w-full h-48 group-hover:scale-105 transition-transform duration-300 mix-blend-normal dark:filter-none"
                 />
               </div>
               <div className="p-6">

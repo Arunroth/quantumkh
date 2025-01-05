@@ -163,7 +163,7 @@ export default function MachinesEditor() {
                   <img
                     src={machine.image}
                     alt={machine.name}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-48 object-contain"
                   />
                 </div>
                 <div className="p-4">

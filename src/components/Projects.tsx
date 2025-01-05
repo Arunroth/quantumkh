@@ -26,7 +26,7 @@ export default function Projects() {
                 <img
                   src={project.image}
                   alt={project.title}
-                  className="w-full h-64 object-cover mix-blend-normal dark:filter-none"
+                  className="w-full h-64 object-contain mix-blend-normal dark:filter-none"
                 />
               </div>
               <div className="p-8">

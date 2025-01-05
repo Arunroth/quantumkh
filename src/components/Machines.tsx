@@ -21,7 +21,7 @@ export default function Machines() {
                 <img
                   src={machine.image}
                   alt={machine.name}
-                  className="w-full h-full object-cover mix-blend-normal dark:filter-none"
+                  className="w-full h-full object-contain mix-blend-normal dark:filter-none"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                   <button className="btn-primary">
