@@ -12,15 +12,24 @@ export enum ProjectStatusEnum {
   IN_PROGRESS = 'in-progress',
   COMPLETED = 'completed',
 }
+
+export interface ProjectStage {
+  projectid: string;
+  name: string,
+  date?: string
+}
+
 export interface ProjectStatus {
   id: string;
   projectid: string;
+  vat: string;
   name: string;
   status: string;
   stage: string;
   startdate: string;
   estimatedcompletion: string;
   progress: number;
+  // stages: ProjectStage[]
 }
 
 export interface Hero {
@@ -418,11 +427,15 @@ class ContentManager {
   }
 
   async getProjectStatusById(ids: string): Promise<ProjectStatus[]> {
-    const id = ids.split(',').map(id => id.trim());
+    const req = ids.split(',');
+    if (req.length != 2) {
+      return [];
+    }
     const { data, error } = await supabase
       .from('project_status')
       .select('*')
-      .in('projectid', id);
+      .eq('projectid', req[0].trim())
+      .eq('vat', req[1].trim());
 
     if (error) {
       console.error('Error fetching project status by ID:', error);
@@ -450,6 +463,11 @@ class ContentManager {
 
 
   async updateProjectStatus(id: string, updatedStatus: ProjectStatus): Promise<ProjectStatus | null> {
+    updatedStatus = {
+      ...updatedStatus,
+      vat: updatedStatus.vat ? updatedStatus.vat.toUpperCase() : "",
+      projectid: updatedStatus.projectid ? updatedStatus.projectid.toUpperCase() : "",
+    }
     const { error } = await supabase
       .from('project_status')
       .update(updatedStatus)

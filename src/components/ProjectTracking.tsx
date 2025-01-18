@@ -29,12 +29,12 @@ export default function ProjectTracking() {
     setError("");
 
     const statuses = await contentManager.getProjectStatusById(projectId);
-    if (statuses) {
+    if (statuses && statuses.length != 0) {
       setProjectData(statuses);
       localStorage.setItem("projectIds", projectId);
     } else {
       setError(
-        "Project not found. Please check the project number and try again."
+        "Project not found. Please check the project number and VAT and try again."
       );
       setProjectData([]);
     }
@@ -49,7 +49,10 @@ export default function ProjectTracking() {
           </h1>
           <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
             Track your project's progress in real-time
+            <br />
+            <span className="text-sm"> By entering Project Number, VAT Number (e.g., PRJ001, 12386857)</span>
           </p>
+
         </div>
 
         <form onSubmit={handleSearch} className="mt-8">
@@ -62,7 +65,7 @@ export default function ProjectTracking() {
                 type="text"
                 value={projectId}
                 onChange={(e) => setProjectId(e.target.value.toUpperCase())}
-                placeholder="Enter Project Number (e.g., PRJ001)"
+                placeholder="Enter Project Number, VAT Number (e.g., PRJ001, 12386857)"
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md leading-5 bg-white dark:bg-dark-900 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               />
             </div>
@@ -93,13 +96,12 @@ export default function ProjectTracking() {
                     </span>
                   </h2>
                   <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      project.status === "completed"
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${project.status === "completed"
                         ? "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400"
                         : project.status === "in-progress"
-                        ? "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400"
-                        : "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400"
-                    }`}
+                          ? "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400"
+                          : "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400"
+                      }`}
                   >
                     {project.status.charAt(0).toUpperCase() +
                       project.status.slice(1)}

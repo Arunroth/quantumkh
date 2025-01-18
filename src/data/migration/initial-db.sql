@@ -64,6 +64,7 @@ CREATE TABLE project_status (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name VARCHAR(255) NOT NULL,
   projectId VARCHAR(255) NOT NULL,
+  vat VARCHAR(255),
   status VARCHAR(20) CHECK (status IN ('queued', 'in-progress', 'completed')) NOT NULL,
   stage VARCHAR(255) NOT NULL,
   startDate TIMESTAMP NOT NULL,

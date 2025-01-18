@@ -18,10 +18,14 @@ export default function ProjectsEditor() {
     null
   );
 
+  const currentDate = new Date();
+  const formattedDate = currentDate.toISOString().split("T")[0];
+
   const handleEdit = (project: ProjectStatus) => {
     setEditingId(project.id);
     setEditedContent(project);
   };
+
 
   const handleSave = () => {
     if (editedContent) {
@@ -37,8 +41,7 @@ export default function ProjectsEditor() {
   };
 
   const handleAdd = () => {
-    const currentDate = new Date();
-    const formattedDate = currentDate.toISOString().split("T")[0];
+
     const newProject = {
       name: "New Tracking Project",
       status: ProjectStatusEnum.QUEUED,
@@ -46,6 +49,8 @@ export default function ProjectsEditor() {
       startdate: formattedDate,
       estimatedcompletion: formattedDate,
       progress: 0,
+      projectid: "",
+      vat: ""
     };
     addProjectStatus(newProject);
   };
@@ -97,6 +102,43 @@ export default function ProjectsEditor() {
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
                 </div>
+                <div>
+                  <div className="flex space-x-4 mb-2">
+                    <div className="w-2/5">
+                      <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Identify number
+                      </label>
+                      <input
+                        type="text"
+                        value={editedContent?.projectid}
+                        onChange={(e) =>
+                          setEditedContent({
+                            ...editedContent!,
+                            projectid: e.target.value,
+                          })
+                        }
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      />
+                    </div>
+                    <div className="w-3/5">
+                      <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        VAT
+                      </label>
+                      <input
+                        type="text"
+                        value={editedContent?.vat}
+                        onChange={(e) =>
+                          setEditedContent({
+                            ...editedContent!,
+                            vat: e.target.value,
+                          })
+                        }
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+
+                </div>
                 <div className="mt-4">
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Status
@@ -138,6 +180,39 @@ export default function ProjectsEditor() {
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
                 </div>
+                {/* 
+                <div>
+                  <label className="inline-flex mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Curent Stage
+                    <button onClick={addStage} className="flex items-center ml-2 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-1 px-2 border border-blue-500 hover:border-transparent rounded"
+                    ><Plus className="h-4 w-4 " />
+                    </button>
+                  </label>
+                  {editedContent?.stages && editedContent?.stages.map((stage, index) => (
+                    <div className="flex space-x-4 mb-2" key={index}>
+                      <div className="w-2/4">
+                        <input
+                          type="text"
+                          value={stage?.name}
+                          onChange={(e) => stage.name = e.target.value}
+                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        /></div>
+
+                      <div className="w-2/4 ">
+                        <input
+                          type="date"
+                          value={stage?.date}
+                          onChange={(e) => stage.date = e.target.value}
+                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                      </div>
+                      <div className="w-1/5 py-2 ">
+                        <button onClick={removeStage(index)} className="flex items-center ml-2 bg-transparent hover:bg-red-500 text-red-700 font-semibold hover:text-white py-1 px-2 border border-red-500 hover:border-transparent rounded"
+                        ><Trash2 className="h-4 w-4 " />
+                        </button>
+                      </div>
+                    </div>
+                  ))} */}
+
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Curent Stage
