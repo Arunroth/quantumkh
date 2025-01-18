@@ -51,7 +51,7 @@ export default function Navbar() {
             </Link>
             <ThemeToggle />
             <button className="btn-primary">
-              Get Started v1.1
+              Get Started
             </button>
           </div>
 

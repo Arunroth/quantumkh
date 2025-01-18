@@ -44,9 +44,7 @@ CREATE TABLE projects (
     description TEXT ,
     image VARCHAR(255) NOT NULL,
     category VARCHAR(255) NOT NULL,
-    completion VARCHAR(255) NOT NULL,
-    ispublic BOOLEAN NOT NULL DEFAULT TRUE,
-    sku VARCHAR(50) NOT NULL;
+    completion VARCHAR(255) NOT NULL
 );
 
 -- Client Table
@@ -59,7 +57,7 @@ CREATE TABLE clients (
     testimonial TEXT,
     author VARCHAR(255) NOT NULL,
     role VARCHAR(255) NOT NULL,
-    order INT NOT NULL
+    range INT NOT NULL
 );
 
 CREATE TABLE project_status (
