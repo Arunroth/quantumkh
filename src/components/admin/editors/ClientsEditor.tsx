@@ -1,10 +1,12 @@
-import { useState } from 'react';
-import { Edit2, Save, X, Plus, Trash2 } from 'lucide-react';
-import { useContent } from '../../../context/ContentContext';
-import type { Client } from '../../../utils/contentManager';
+import { useState } from "react";
+import { Edit2, Save, X, Plus, Trash2 } from "lucide-react";
+import { useContent } from "../../../context/ContentContext";
+import { type Client } from "../../../utils/contentManager";
+import ImageUpload from "../../common/ImageUpload";
 
 export default function ClientsEditor() {
   const { clients, addClient, updateClient, deleteClient } = useContent();
+  const [recentClients, setRecentClients] = useState<Client[]>(clients);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editedContent, setEditedContent] = useState<Client | null>(null);
 
@@ -13,9 +15,14 @@ export default function ClientsEditor() {
     setEditedContent(client);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (editedContent) {
-      updateClient(editedContent.id, editedContent);
+      const updatedClients = await updateClient(
+        editedContent.id,
+        editedContent
+      );
+      console.log(updatedClients);
+      setRecentClients(updatedClients);
       setEditingId(null);
       setEditedContent(null);
     }
@@ -26,21 +33,23 @@ export default function ClientsEditor() {
     setEditedContent(null);
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     const newClient = {
-      name: 'New Client',
-      logo: 'https://images.unsplash.com/photo-1565962768804-b667f1d18a55?auto=format&fit=crop&q=80',
-      industry: 'Manufacturing',
-      type: 'Enterprise',
-      testimonial: '',
-      author: 'admin',
-      role: ''
+      name: "New Client",
+      logo: "https://images.unsplash.com/photo-1565962768804-b667f1d18a55?auto=format&fit=crop&q=80",
+      industry: "Manufacturing",
+      type: "Enterprise",
+      testimonial: "",
+      author: "admin",
+      role: "",
+      range: 1,
     };
-    addClient(newClient);
+    const newClients = await addClient(newClient);
+    setRecentClients(newClients);
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this client?')) {
+    if (window.confirm("Are you sure you want to delete this client?")) {
       deleteClient(id);
     }
   };
@@ -48,7 +57,9 @@ export default function ClientsEditor() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-white">Clients</h2>
+        <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+          Clients
+        </h2>
         <button
           onClick={handleAdd}
           className="flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400"
@@ -59,78 +70,149 @@ export default function ClientsEditor() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {clients.map((client) => (
-          <div key={client.id} className="border dark:border-gray-700 rounded-lg overflow-hidden">
+        {recentClients.map((client: Client) => (
+          <div
+            key={client.id}
+            className="border dark:border-gray-700 rounded-lg overflow-hidden"
+          >
             {editingId === client.id ? (
               <div className="p-4 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Rank order
+                  </label>
+                  <input
+                    type="number"
+                    value={editedContent?.range}
+                    onChange={(e) =>
+                      setEditedContent({
+                        ...editedContent!,
+                        range: e.target.value
+                          ? parseInt(e.target.value, 10)
+                          : 0,
+                      })
+                    }
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Name
+                  </label>
                   <input
                     type="text"
                     value={editedContent?.name}
-                    onChange={(e) => setEditedContent({ ...editedContent!, name: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    onChange={(e) =>
+                      setEditedContent({
+                        ...editedContent!,
+                        name: e.target.value,
+                      })
+                    }
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Logo URL</label>
-                  <input
-                    type="text"
-                    value={editedContent?.logo}
-                    onChange={(e) => setEditedContent({ ...editedContent!, logo: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Logo Image
+                  </label>
+                  <ImageUpload
+                    currentImageUrl={editedContent?.logo || ""}
+                    onImageUrlChange={(url) =>
+                      setEditedContent({ ...editedContent!, logo: url })
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Industry</label>
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Industry
+                  </label>
                   <input
                     type="text"
                     value={editedContent?.industry}
-                    onChange={(e) => setEditedContent({ ...editedContent!, industry: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    onChange={(e) =>
+                      setEditedContent({
+                        ...editedContent!,
+                        industry: e.target.value,
+                      })
+                    }
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Type</label>
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Type
+                  </label>
                   <input
                     type="text"
                     value={editedContent?.type}
-                    onChange={(e) => setEditedContent({ ...editedContent!, type: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    onChange={(e) =>
+                      setEditedContent({
+                        ...editedContent!,
+                        type: e.target.value,
+                      })
+                    }
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Testimonial</label>
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Testimonial
+                  </label>
                   <textarea
                     value={editedContent?.testimonial}
-                    onChange={(e) => setEditedContent({ ...editedContent!, testimonial: e.target.value })}
+                    onChange={(e) =>
+                      setEditedContent({
+                        ...editedContent!,
+                        testimonial: e.target.value,
+                      })
+                    }
                     rows={3}
-                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Author</label>
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Author
+                  </label>
                   <input
                     type="text"
                     value={editedContent?.author}
-                    onChange={(e) => setEditedContent({ ...editedContent!, author: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    onChange={(e) =>
+                      setEditedContent({
+                        ...editedContent!,
+                        author: e.target.value,
+                      })
+                    }
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Role
+                  </label>
                   <input
                     type="text"
                     value={editedContent?.role}
-                    onChange={(e) => setEditedContent({ ...editedContent!, role: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    onChange={(e) =>
+                      setEditedContent({
+                        ...editedContent!,
+                        role: e.target.value,
+                      })
+                    }
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
                 </div>
                 <div className="flex justify-end space-x-2">
-                  <button onClick={handleSave} className="text-green-600 hover:text-green-700">
+                  <button
+                    onClick={handleSave}
+                    className="text-green-600 hover:text-green-700"
+                  >
                     <Save className="h-5 w-5" />
                   </button>
-                  <button onClick={handleCancel} className="text-red-600 hover:text-red-700">
+                  <button
+                    onClick={handleCancel}
+                    className="text-red-600 hover:text-red-700"
+                  >
                     <X className="h-5 w-5" />
                   </button>
                 </div>
@@ -147,11 +229,17 @@ export default function ClientsEditor() {
                           className="max-h-full object-contain"
                         />
                       </div>
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white text-center">{client.name}</h3>
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-white text-center">
+                        {client.name}
+                      </h3>
                       <div className="mt-2 text-center">
-                        <span className="text-sm text-primary-500">{client.industry}</span>
+                        <span className="text-sm text-primary-500">
+                          {client.industry}
+                        </span>
                         <span className="mx-2 text-gray-300">|</span>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">{client.type}</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {client.type}
+                        </span>
                       </div>
                       {client.testimonial && (
                         <blockquote className="mt-4 text-sm text-gray-600 dark:text-gray-400 italic">
@@ -159,7 +247,12 @@ export default function ClientsEditor() {
                           {client.author && (
                             <footer className="mt-2 text-sm">
                               <strong>{client.author}</strong>
-                              {client.role && <span className="text-gray-500"> - {client.role}</span>}
+                              {client.role && (
+                                <span className="text-gray-500">
+                                  {" "}
+                                  - {client.role}
+                                </span>
+                              )}
                             </footer>
                           )}
                         </blockquote>

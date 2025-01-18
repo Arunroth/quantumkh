@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
-import { Save, X } from 'lucide-react';
-import { useContent } from '../../../context/ContentContext';
-import { Hero } from '../../../utils/contentManager';
+import { useState } from "react";
+import { Save, X } from "lucide-react";
+import { useContent } from "../../../context/ContentContext";
+import { Hero } from "../../../utils/contentManager";
+import ImageUpload from "../../common/ImageUpload";
 
 export default function HeroEditor() {
   const { hero, updateHero } = useContent();
@@ -28,20 +29,28 @@ export default function HeroEditor() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-white">Hero Section</h2>
+        <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+          Hero Section
+        </h2>
         {!isEditing ? (
           <button
-          onClick={() => handleEdit(hero)}
+            onClick={() => handleEdit(hero)}
             className="text-primary-600 hover:text-primary-700 dark:text-primary-400"
           >
             Edit Content
           </button>
         ) : (
           <div className="flex space-x-2">
-            <button onClick={handleSave} className="text-green-600 hover:text-green-700">
+            <button
+              onClick={handleSave}
+              className="text-green-600 hover:text-green-700"
+            >
               <Save className="h-5 w-5" />
             </button>
-            <button onClick={handleCancel} className="text-red-600 hover:text-red-700">
+            <button
+              onClick={handleCancel}
+              className="text-red-600 hover:text-red-700"
+            >
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -52,48 +61,80 @@ export default function HeroEditor() {
         {isEditing ? (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+              <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Title
+              </label>
               <input
                 type="text"
                 value={editedContent.title}
-                onChange={(e) => setEditedContent({ ...editedContent, title: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                onChange={(e) =>
+                  setEditedContent({ ...editedContent, title: e.target.value })
+                }
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Subtitle</label>
+              <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Subtitle
+              </label>
               <input
                 type="text"
                 value={editedContent.subtitle}
-                onChange={(e) => setEditedContent({ ...editedContent, subtitle: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                onChange={(e) =>
+                  setEditedContent({
+                    ...editedContent,
+                    subtitle: e.target.value,
+                  })
+                }
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Banner</label>
-              <input
-                type="text"
-                value={editedContent.banner}
-                onChange={(e) => setEditedContent({ ...editedContent, banner: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+              <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Banner
+              </label>
+              <ImageUpload
+                currentImageUrl={editedContent?.banner || ""}
+                onImageUrlChange={(url) =>
+                  setEditedContent({ ...editedContent!, banner: url })
+                }
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+              <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Description
+              </label>
               <textarea
                 value={editedContent.description}
-                onChange={(e) => setEditedContent({ ...editedContent, description: e.target.value })}
+                onChange={(e) =>
+                  setEditedContent({
+                    ...editedContent,
+                    description: e.target.value,
+                  })
+                }
                 rows={3}
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               />
             </div>
           </>
         ) : (
           <div className="space-y-2">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Title: {hero.title}</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Subtitle: {hero.subtitle}</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Banner URL: {hero.banner}</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Description: {hero.description}</p>
+            <div className="aspect-w-16 aspect-h-9 relative">
+              <img
+                src={hero.banner}
+                alt={hero.title}
+                className="w-full h-48 object-contain"
+              />
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Title: {hero.title}
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Subtitle: {hero.subtitle}
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Description: {hero.description}
+            </p>
           </div>
         )}
       </div>

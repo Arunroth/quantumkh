@@ -1,22 +1,31 @@
 import { useState } from "react";
 import { Edit2, Save, X, Plus, Trash2 } from "lucide-react";
 import { useContent } from "../../../context/ContentContext";
-import type { Project } from "../../../utils/contentManager";
-import ImageUpload from "../../common/ImageUpload";
+import {
+  ProjectStatus,
+  ProjectStatusEnum,
+} from "./../../../utils/contentManager";
 
 export default function ProjectsEditor() {
-  const { projects, addProject, updateProject, deleteProject } = useContent();
+  const {
+    projectStatus,
+    addProjectStatus,
+    updateProjectStatus,
+    deleteProjectStatus,
+  } = useContent();
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editedContent, setEditedContent] = useState<Project | null>(null);
+  const [editedContent, setEditedContent] = useState<ProjectStatus | null>(
+    null
+  );
 
-  const handleEdit = (project: Project) => {
+  const handleEdit = (project: ProjectStatus) => {
     setEditingId(project.id);
     setEditedContent(project);
   };
 
   const handleSave = () => {
     if (editedContent) {
-      updateProject(editedContent.id, editedContent);
+      updateProjectStatus(editedContent.id, editedContent);
       setEditingId(null);
       setEditedContent(null);
     }
@@ -28,21 +37,24 @@ export default function ProjectsEditor() {
   };
 
   const handleAdd = () => {
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split("T")[0];
     const newProject = {
-      title: "New Project",
-      client: "Client Name",
-      description: "Project description",
-      image:
-        "https://images.unsplash.com/photo-1565962768804-b667f1d18a55?auto=format&fit=crop&q=80",
-      category: "Manufacturing",
-      completion: new Date().getFullYear().toString()
+      name: "New Tracking Project",
+      status: ProjectStatusEnum.QUEUED,
+      stage: "Review",
+      startdate: formattedDate,
+      estimatedcompletion: formattedDate,
+      progress: 0,
     };
-    addProject(newProject);
+    addProjectStatus(newProject);
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm("Are you sure you want to delete this project?")) {
-      deleteProject(id);
+    if (
+      window.confirm("Are you sure you want to delete this tracking project?")
+    ) {
+      deleteProjectStatus(id);
     }
   };
 
@@ -50,19 +62,19 @@ export default function ProjectsEditor() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-          Projects
+          Tracking Projects
         </h2>
         <button
           onClick={handleAdd}
           className="flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400"
         >
           <Plus className="h-5 w-5 mr-1" />
-          Add Project
+          Add Tracking Project
         </button>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {projects.map((project) => (
+        {projectStatus.map((project) => (
           <div
             key={project.id}
             className="border dark:border-gray-700 rounded-lg overflow-hidden"
@@ -71,15 +83,56 @@ export default function ProjectsEditor() {
               <div className="p-4 space-y-4">
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Title
+                    Project Name
                   </label>
                   <input
                     type="text"
-                    value={editedContent?.title}
+                    value={editedContent?.name}
                     onChange={(e) =>
                       setEditedContent({
                         ...editedContent!,
-                        title: e.target.value,
+                        name: e.target.value,
+                      })
+                    }
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  />
+                </div>
+                <div className="mt-4">
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Status
+                  </label>
+                  <select
+                    value={editedContent?.status}
+                    onChange={(e) =>
+                      setEditedContent({
+                        ...editedContent!,
+                        status: e.target.value, // Convert to boolean
+                      })
+                    }
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  >
+                    <option value={ProjectStatusEnum.QUEUED}>Queued</option>
+                    <option value={ProjectStatusEnum.IN_PROGRESS}>
+                      In Progress
+                    </option>
+                    <option value={ProjectStatusEnum.COMPLETED}>
+                      Completed
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Processing Percentage (%)
+                  </label>
+                  <input
+                    type="number"
+                    value={editedContent?.progress}
+                    onChange={(e) =>
+                      setEditedContent({
+                        ...editedContent!,
+                        progress: e.target.value
+                          ? parseInt(e.target.value, 10)
+                          : 0,
                       })
                     }
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -87,74 +140,57 @@ export default function ProjectsEditor() {
                 </div>
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Client
+                    Curent Stage
                   </label>
                   <input
                     type="text"
-                    value={editedContent?.client}
+                    value={editedContent?.stage}
                     onChange={(e) =>
                       setEditedContent({
                         ...editedContent!,
-                        client: e.target.value,
+                        stage: e.target.value,
                       })
                     }
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
                 </div>
+
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Description
-                  </label>
-                  <textarea
-                    value={editedContent?.description}
-                    onChange={(e) =>
-                      setEditedContent({
-                        ...editedContent!,
-                        description: e.target.value,
-                      })
-                    }
-                    rows={3}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white mb-2">
-                    Image
-                  </label>
-                  <ImageUpload
-                    currentImageUrl={editedContent?.image || ""}
-                    onImageUrlChange={(url) =>
-                      setEditedContent({ ...editedContent!, image: url })
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Category
+                    Start Date
                   </label>
                   <input
-                    type="text"
-                    value={editedContent?.category}
+                    type="date"
+                    value={
+                      editedContent?.startdate
+                        ? editedContent.startdate.slice(0, 10)
+                        : ""
+                    }
                     onChange={(e) =>
                       setEditedContent({
                         ...editedContent!,
-                        category: e.target.value,
+                        startdate: e.target.value,
                       })
                     }
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
                 </div>
+
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Completion Year
+                    Estimated Completion
                   </label>
                   <input
-                    type="text"
-                    value={editedContent?.completion}
+                    type="date"
+                    value={
+                      editedContent?.estimatedcompletion
+                        ? editedContent.estimatedcompletion.slice(0, 10)
+                        : ""
+                    }
                     onChange={(e) =>
                       setEditedContent({
                         ...editedContent!,
-                        completion: e.target.value,
+                        estimatedcompletion: e.target.value,
                       })
                     }
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -177,28 +213,37 @@ export default function ProjectsEditor() {
               </div>
             ) : (
               <div>
-                <div className="aspect-w-16 aspect-h-9 relative">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-48 object-contain"
-                  />
-                </div>
                 <div className="p-4">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white">{project.title}</h3>
-                      <p className="text-sm text-primary-500">{project.client}</p>
-                      <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{project.description}</p>
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                        {project.name}
+                      </h3>
+                      <p className="text-sm text-primary-500">
+                        {project.projectid}
+                      </p>
+                      <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                        {project.stage}
+                      </p>
                       <div className="mt-2">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/20 text-primary-800 dark:text-primary-400">
-                          {project.category}
-                        </span>
-                        <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
-                          Completed: {project.completion}
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-primary-100 dark:bg-primary-900/20 text-primary-800 dark:text-primary-400">
+                          {project.status.toUpperCase()}
                         </span>
                       </div>
+                      <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                        Start date:{" "}
+                        {project?.startdate
+                          ? project.startdate.slice(0, 10)
+                          : ""}
+                      </p>
+                      <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                        Estimated completion:{" "}
+                        {project?.estimatedcompletion
+                          ? project.estimatedcompletion.slice(0, 10)
+                          : ""}
+                      </p>
                     </div>
+
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleEdit(project)}
@@ -213,6 +258,22 @@ export default function ProjectsEditor() {
                         <Trash2 className="h-5 w-5" />
                       </button>
                     </div>
+                  </div>
+                </div>
+                <div className="px-4 pb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                      Progress
+                    </span>
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                      {project.progress}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                    <div
+                      className="bg-primary-500 h-2.5 rounded-full transition-all duration-500"
+                      style={{ width: `${project.progress}%` }}
+                    ></div>
                   </div>
                 </div>
               </div>

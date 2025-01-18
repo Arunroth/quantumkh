@@ -7,7 +7,9 @@
       "description": "Precision-engineered drivetrain components with tight tolerances for a leading automotive manufacturer.",
       "image": "https://images.unsplash.com/photo-1565962768804-b667f1d18a55?auto=format&fit=crop&q=80",
       "category": "Automotive",
-      "completion": "2024"
+      "completion": "2024",
+      "ispublic": true,
+      "sku": "PJR-001"
     }
   ]
 }

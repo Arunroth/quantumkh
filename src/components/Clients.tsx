@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { useContent } from '../context/ContentContext';
 
@@ -19,19 +19,21 @@ export default function Clients() {
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
+    console.log('mouse down');
     setIsDragging(true);
-    setStartX(e.pageX - (sliderRef.current?.offsetLeft || 0));
+    setStartX(e.clientX - (sliderRef.current?.offsetLeft || 0));
     setScrollLeft(sliderRef.current?.scrollLeft || 0);
   };
 
   const handleMouseUp = () => {
-    setIsDragging(false);
+    console.log('mouse up');
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    console.log('mouse move');
     if (!isDragging) return;
     e.preventDefault();
-    const x = e.pageX - (sliderRef.current?.offsetLeft || 0);
+    const x = e.clientX - (sliderRef.current?.offsetLeft || 0);
     const walk = (x - startX) * 2;
     if (sliderRef.current) {
       sliderRef.current.scrollLeft = scrollLeft - walk;
@@ -53,7 +55,7 @@ export default function Clients() {
         <div className="mt-16 relative">
           <div 
             ref={sliderRef}
-            className="overflow-x-auto whitespace-nowrap hide-scrollbar cursor-grab active:cursor-grabbing"
+            className="overflow-x-auto whitespace-nowrap hide-scrollbar cursor-grab active:cursor-grabbing "
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}

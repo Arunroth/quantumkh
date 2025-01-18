@@ -2,9 +2,26 @@ import servicesData from '../data/services.json';
 import machinesData from '../data/machines.json';
 import projectsData from '../data/projects.json';
 import clientsData from '../data/clients.json';
+import trackingProejctsData from '../data/tracking.json';
 import heroData from '../data/hero.json';
 import featuresData from '../data/features.json';
 import { supabase } from './supabase';
+
+export enum ProjectStatusEnum {
+  QUEUED = 'queued',
+  IN_PROGRESS = 'in-progress',
+  COMPLETED = 'completed',
+}
+export interface ProjectStatus {
+  id: string;
+  projectid: string;
+  name: string;
+  status: string;
+  stage: string;
+  startdate: string;
+  estimatedcompletion: string;
+  progress: number;
+}
 
 export interface Hero {
   id?: string;
@@ -59,6 +76,7 @@ export interface Client {
   testimonial: string;
   author: string;
   role: string;
+  range: number;
 }
 
 class ContentManager {
@@ -68,13 +86,13 @@ class ContentManager {
   private machines: Machine[] = machinesData.machines;
   private projects: Project[] = projectsData.projects;
   private clients: Client[] = clientsData.clients;
+  private projectStatus: ProjectStatus[] = trackingProejctsData.projects;
 
   // Hero
   async getHero(): Promise<Hero> {
     const { data, error } = await supabase
       .from('hero')
       .select('*')
-      .order('created_at', { ascending: false }) // Sort by created_at in descending order
       .limit(1);
     if (error) {
       console.error('Error hero services:', error);
@@ -85,7 +103,7 @@ class ContentManager {
   }
 
   async updateHero(hero: Hero): Promise<Hero> {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('hero')
       .update(hero)
       .eq('id', hero.id);
@@ -122,7 +140,7 @@ class ContentManager {
   }
 
   async updateFeature(id: string, feature: Partial<Feature>): Promise<Feature | null> {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('features')
       .update(feature)
       .eq('id', id);
@@ -137,7 +155,7 @@ class ContentManager {
   }
 
   async deleteFeature(id: string): Promise<boolean> {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('features')
       .delete()
       .eq('id', id); // Match the specific service by ID
@@ -177,13 +195,12 @@ class ContentManager {
   }
 
   async updateService(id: string, service: Partial<Service>): Promise<Service | null> {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('services')
       .update(service)
       .eq('id', id);
     if (error) {
       console.error('Error updating client:', error);
-    } else {
     }
     const index = this.services.findIndex(s => s.id === id);
     if (index === -1) return null;
@@ -237,13 +254,12 @@ class ContentManager {
   }
 
   async updateMachine(id: string, machine: Partial<Machine>): Promise<Machine | null> {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('machines')
       .update(machine)
       .eq('id', id);
     if (error) {
       console.error('Error updating machine:', error);
-    } else {
     }
     const index = this.machines.findIndex(m => m.id === id);
     if (index === -1) return null;
@@ -297,13 +313,12 @@ class ContentManager {
   }
 
   async updateProject(id: string, project: Partial<Project>): Promise<Project | null> {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('projects')
       .update(project)
       .eq('id', id);
     if (error) {
       console.error('Error updating project:', error);
-    } else {
     }
     const index = this.projects.findIndex(p => p.id === id);
     if (index === -1) return null;
@@ -334,7 +349,7 @@ class ContentManager {
   async getClients(): Promise<Client[]> {
     const { data, error } = await supabase
       .from('clients')
-      .select('*');
+      .select('*').order('range', { ascending: true });
 
     if (error) {
       console.error('Error fetching clients:', error);
@@ -353,24 +368,23 @@ class ContentManager {
     } else {
       this.clients.push(data[0]);
     }
-    return this.clients;
+    return this.clients.sort((a, b) => a.range - b.range);
   }
 
-  async updateClient(id: string, client: Partial<Client>): Promise<Client | null> {
-    const { data, error } = await supabase
+  async updateClient(id: string, client: Partial<Client>): Promise<Client[]> {
+    const { error } = await supabase
       .from('clients')
       .update(client)
       .eq('id', id);
 
     if (error) {
       console.error('Error updating client:', error);
-    } else {
     }
     const index = this.clients.findIndex(c => c.id === id);
-    if (index === -1) return null;
-
-    this.clients[index] = { ...this.clients[index], ...client };
-    return this.clients[index];
+    if (index != -1) {
+      this.clients[index] = { ...this.clients[index], ...client };
+    }
+    return this.clients.sort((a, b) => a.range - b.range);;
   }
 
   async deleteClient(id: string): Promise<boolean> {
@@ -381,12 +395,90 @@ class ContentManager {
 
     if (error) {
       console.error('Error deleting client:', error);
-    } else {
     }
     const index = this.clients.findIndex(c => c.id === id);
     if (index === -1) return false;
 
     this.clients.splice(index, 1);
+    return true;
+  }
+
+  async getProjectStatus(): Promise<ProjectStatus[]> {
+    const { data, error } = await supabase
+      .from('project_status')
+      .select('*')
+
+    if (error) {
+      console.error('Error fetching project status by ID:', error);
+      return [];
+    }
+    this.projectStatus = data as ProjectStatus[];
+
+    return this.projectStatus;
+  }
+
+  async getProjectStatusById(ids: string): Promise<ProjectStatus[]> {
+    const id = ids.split(',').map(id => id.trim());
+    const { data, error } = await supabase
+      .from('project_status')
+      .select('*')
+      .in('projectid', id);
+
+    if (error) {
+      console.error('Error fetching project status by ID:', error);
+      return [];
+    }
+    this.projectStatus = data as ProjectStatus[];
+
+    return this.projectStatus;
+  }
+
+  async addProjectStatus(projectStatus: Omit<ProjectStatus, "id" | "projectid">): Promise<ProjectStatus[]> {
+    const newData = { ...projectStatus, projectid: `PJR${Math.floor(1000 + Math.random() * 9000)}` };
+    const { data, error } = await supabase
+      .from('project_status')
+      .insert([newData]).select();
+
+    if (error) {
+      console.error('Error creating project status:', error);
+    } else {
+      this.projectStatus.push(data[0]); // Add the new project status to the list
+    }
+    console.log('Project status:', this.projectStatus);
+    return this.projectStatus; // Return the created project status
+  }
+
+
+  async updateProjectStatus(id: string, updatedStatus: ProjectStatus): Promise<ProjectStatus | null> {
+    const { error } = await supabase
+      .from('project_status')
+      .update(updatedStatus)
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error updating project status:', error);
+      return null;
+    }
+    const index = this.projectStatus.findIndex(p => p.id === id);
+    if (index === -1) return null;
+
+    this.projectStatus[index] = { ...this.projectStatus[index], ...updatedStatus };
+    return this.projectStatus[index];
+  }
+
+  async deleteProjectStatus(id: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('project_status')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting project tracking:', error);
+    }
+    const index = this.projectStatus.findIndex(p => p.id === id);
+    if (index === -1) return false;
+
+    this.projectStatus.splice(index, 1);
     return true;
   }
 }

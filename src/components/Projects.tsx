@@ -5,7 +5,7 @@ export default function Projects() {
   const { projects } = useContent();
 
   return (
-    <div className="bg-white dark:bg-dark-900 py-24 transition-colors">
+    <div className="bg-white dark:bg-dark-900 py-24 transition-colors ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
@@ -16,7 +16,7 @@ export default function Projects() {
           </p>
         </div>
 
-        <div className="mt-16 grid grid-cols-1 gap-12 lg:grid-cols-2">
+        <div className="mt-16 grid grid-cols-1 gap-12 lg:grid-cols-2 ">
           {projects.map((project) => (
             <div
               key={project.id}
@@ -58,7 +58,7 @@ export default function Projects() {
           ))}
         </div>
 
-        <div className="mt-16 text-center">
+        <div className="mt-16 text-cente hidden">
           <button className="btn-primary">
             View All Projects
             <ArrowRight className="ml-2 h-5 w-5" />
