@@ -295,7 +295,7 @@ export default function ProjectsEditor() {
                         {project.name}
                       </h3>
                       <p className="text-sm text-primary-500">
-                        {project.projectid}
+                        {project.projectid}, VAT({project.vat})
                       </p>
                       <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                         {project.stage}
