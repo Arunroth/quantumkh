@@ -1,6 +1,6 @@
 import { supabase } from "./supabase";
 
-const BUCKETNAME = "public-images";
+const BUCKETNAME = "QT-PUBLIC";
 
 export const uploadImage = async (file: File, bucketName: string = BUCKETNAME): Promise<string> => {
     const fileName = `${Date.now()}-${file.name}`;
