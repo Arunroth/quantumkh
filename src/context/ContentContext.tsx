@@ -14,6 +14,7 @@ import {
   Hero,
   Feature,
   ProjectStatus,
+  ProjectStage,
 } from "../utils/contentManager";
 
 interface ContentContextType {
@@ -40,13 +41,14 @@ interface ContentContextType {
   updateClient: (id: string, client: Partial<Client>) => Promise<Client[]>;
   deleteClient: (id: string) => void;
   searchProjectStatus: (ids: string) => Promise<ProjectStatus[]>;
-  projectStatus:ProjectStatus[];
+  projectStatus: ProjectStatus[];
   addProjectStatus: (
     projectStatus: Omit<ProjectStatus, "id" | "projectid">
   ) => void;
   updateProjectStatus: (
     id: string,
-    updatedStatus: ProjectStatus
+    updatedStatus: ProjectStatus,
+    stages: ProjectStage[]
   ) => Promise<ProjectStatus[]>;
   deleteProjectStatus: (id: string) => void;
 }
@@ -196,9 +198,10 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
   const updateProjectStatus = async (
     id: string,
-    updatedStatus: ProjectStatus
+    updatedStatus: ProjectStatus,
+    stages: ProjectStage[]
   ) => {
-    const data = await contentManager.updateProjectStatus(id, updatedStatus);
+    const data = await contentManager.updateProjectStatus(id, updatedStatus, stages);
     if (data) {
       setProjectStatus(projectStatus.map((p) => (p.id === id ? data : p)));
     }

@@ -71,3 +71,10 @@ CREATE TABLE project_status (
   estimatedCompletion TIMESTAMP NOT NULL,
   progress INTEGER CHECK (progress >= 0 AND progress <= 100) NOT NULL
 );
+
+CREATE TABLE project_stages (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name VARCHAR(255) NOT NULL,
+  projectid VARCHAR(255) NOT NULL,
+  date TIMESTAMP NOT NULL,
+);

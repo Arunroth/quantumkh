@@ -14,6 +14,7 @@ export enum ProjectStatusEnum {
 }
 
 export interface ProjectStage {
+  id?: string;
   projectid: string;
   name: string,
   date?: string
@@ -29,7 +30,7 @@ export interface ProjectStatus {
   startdate: string;
   estimatedcompletion: string;
   progress: number;
-  // stages: ProjectStage[]
+  stages?: ProjectStage[]
 }
 
 export interface Hero {
@@ -415,13 +416,47 @@ class ContentManager {
   async getProjectStatus(): Promise<ProjectStatus[]> {
     const { data, error } = await supabase
       .from('project_status')
-      .select('*')
+      .select(`*`)
 
     if (error) {
       console.error('Error fetching project status by ID:', error);
       return [];
     }
     this.projectStatus = data as ProjectStatus[];
+
+    await this.getProjectStagesByProjectId(this.projectStatus.map(status => status.id));
+
+    return this.projectStatus;
+  }
+
+  async deleteStage(id: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('project_stages')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting stage:', error);
+    }
+    return true;
+  }
+
+  async getProjectStagesByProjectId(projectids: string[]): Promise<ProjectStatus[]> {
+    const { data: stages, error: stageEror } = await supabase
+      .from('project_stages')
+      .select(`*`)
+      .in('projectid', projectids)
+
+    if (stageEror) {
+      console.error('Error fetching project status by ID:', stageEror);
+      return this.projectStatus;
+    }
+
+    // Manually join the data
+    this.projectStatus = this.projectStatus.map(status => ({
+      ...status,
+      stages: stages.filter(stage => stage.projectid === status.id).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    }));
 
     return this.projectStatus;
   }
@@ -443,11 +478,14 @@ class ContentManager {
     }
     this.projectStatus = data as ProjectStatus[];
 
+    await this.getProjectStagesByProjectId(this.projectStatus.map(status => status.id));
+
     return this.projectStatus;
   }
 
   async addProjectStatus(projectStatus: Omit<ProjectStatus, "id" | "projectid">): Promise<ProjectStatus[]> {
     const newData = { ...projectStatus, projectid: `PJR${Math.floor(1000 + Math.random() * 9000)}` };
+    delete newData.stages;
     const { data, error } = await supabase
       .from('project_status')
       .insert([newData]).select();
@@ -462,16 +500,42 @@ class ContentManager {
   }
 
 
-  async updateProjectStatus(id: string, updatedStatus: ProjectStatus): Promise<ProjectStatus | null> {
-    updatedStatus = {
+  async updateProjectStatus(id: string, updatedStatus: ProjectStatus, stages: ProjectStage[]): Promise<ProjectStatus | null> {
+    const dataUpdateStatus = {
       ...updatedStatus,
       vat: updatedStatus.vat ? updatedStatus.vat.toUpperCase() : "",
       projectid: updatedStatus.projectid ? updatedStatus.projectid.toUpperCase() : "",
     }
+    delete dataUpdateStatus.stages;
     const { error } = await supabase
       .from('project_status')
-      .update(updatedStatus)
+      .update(dataUpdateStatus)
       .eq('id', id);
+
+    const updatedStages: ProjectStage[] = [];
+    if (stages) {
+      stages.forEach(async (stage) => {
+        if (stage.id == "" || stage.id == undefined) {
+          const { data, error } = await supabase.from('project_stages').insert(stage).select();
+          if (error) {
+            console.error('Error updating project status:', error);
+          }
+          updatedStages.push(data![0] as ProjectStage);
+        } else {
+          const { data: updatedStage, error } = await supabase
+            .from('project_stages')
+            .update(stage)
+            .eq('id', stage.id).select();
+          if (error) {
+            console.error('Error updating project status:', error);
+          }
+          updatedStages.push(updatedStage![0] as ProjectStage);
+        }
+      });
+    }
+
+    updatedStatus.stages = updatedStages;
+
 
     if (error) {
       console.error('Error updating project status:', error);

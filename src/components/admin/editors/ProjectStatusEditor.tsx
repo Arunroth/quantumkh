@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Edit2, Save, X, Plus, Trash2 } from "lucide-react";
 import { useContent } from "../../../context/ContentContext";
 import {
+  contentManager,
+  ProjectStage,
   ProjectStatus,
   ProjectStatusEnum,
 } from "./../../../utils/contentManager";
@@ -17,31 +19,64 @@ export default function ProjectsEditor() {
   const [editedContent, setEditedContent] = useState<ProjectStatus | null>(
     null
   );
+  const [stages, setStages] = useState<ProjectStage[]>([]);
 
   const currentDate = new Date();
   const formattedDate = currentDate.toISOString().split("T")[0];
 
+  const initStages = (project: ProjectStatus) => {
+    if (project.stages && project.stages.length > 0) {
+      setStages(project.stages);
+    } else {
+      setStages([
+        { projectid: project?.id ?? "", name: "", date: formattedDate },
+      ]);
+    }
+  };
+
+  const addStage = () => {
+    setStages([
+      ...stages,
+      { projectid: editedContent?.id ?? "", name: "", date: formattedDate },
+    ]);
+  };
+
+  const removeStage = (index: number) => {
+    return async () => {
+      if (window.confirm("Are you sure you want to delete this stage?")) {
+        let isDelete = true;
+        if (stages[index].id) {
+          isDelete = await contentManager.deleteStage(stages[index].id);
+        }
+        if (isDelete) {
+          setStages(stages.filter((_, i) => i !== index));
+        }
+      }
+    };
+  };
+
   const handleEdit = (project: ProjectStatus) => {
     setEditingId(project.id);
     setEditedContent(project);
+    initStages(project);
   };
 
-
-  const handleSave = () => {
+  const handleSave = async () => {
     if (editedContent) {
-      updateProjectStatus(editedContent.id, editedContent);
+      await updateProjectStatus(editedContent.id, editedContent, stages);
       setEditingId(null);
       setEditedContent(null);
     }
+    setStages([]);
   };
 
   const handleCancel = () => {
     setEditingId(null);
     setEditedContent(null);
+    setStages([]);
   };
 
   const handleAdd = () => {
-
     const newProject = {
       name: "New Tracking Project",
       status: ProjectStatusEnum.QUEUED,
@@ -50,7 +85,8 @@ export default function ProjectsEditor() {
       estimatedcompletion: formattedDate,
       progress: 0,
       projectid: "",
-      vat: ""
+      vat: "",
+      stages: [],
     };
     addProjectStatus(newProject);
   };
@@ -61,6 +97,10 @@ export default function ProjectsEditor() {
     ) {
       deleteProjectStatus(id);
     }
+  };
+
+  const getFormattedDate = (date?: string) => {
+    return date ? date.slice(0, 10) : "";
   };
 
   return (
@@ -137,7 +177,6 @@ export default function ProjectsEditor() {
                       />
                     </div>
                   </div>
-
                 </div>
                 <div className="mt-4">
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -162,8 +201,8 @@ export default function ProjectsEditor() {
                     </option>
                   </select>
                 </div>
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white">
                     Processing Percentage (%)
                   </label>
                   <input
@@ -180,110 +219,130 @@ export default function ProjectsEditor() {
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
                 </div>
-                {/* 
-                <div>
+
+                <div className="mt-4">
                   <label className="inline-flex mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Curent Stage
-                    <button onClick={addStage} className="flex items-center ml-2 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-1 px-2 border border-blue-500 hover:border-transparent rounded"
-                    ><Plus className="h-4 w-4 " />
+                    Staging
+                    <button
+                      onClick={addStage}
+                      className="flex items-center ml-2 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-1 px-2 border border-blue-500 hover:border-transparent rounded"
+                    >
+                      <Plus className="h-4 w-4 " />
                     </button>
                   </label>
-                  {editedContent?.stages && editedContent?.stages.map((stage, index) => (
-                    <div className="flex space-x-4 mb-2" key={index}>
-                      <div className="w-2/4">
-                        <input
-                          type="text"
-                          value={stage?.name}
-                          onChange={(e) => stage.name = e.target.value}
-                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        /></div>
 
-                      <div className="w-2/4 ">
-                        <input
-                          type="date"
-                          value={stage?.date}
-                          onChange={(e) => stage.date = e.target.value}
-                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                  {stages &&
+                    stages.map((stage, index) => (
+                      <div className="flex space-x-4 mb-2" key={index}>
+                        <div className="w-2/4">
+                          <input
+                            type="text"
+                            value={stage?.name}
+                            onChange={(e) => {
+                              const updatedStages = [...stages]; // Create a shallow copy of stages
+                              updatedStages[index] = {
+                                ...stage,
+                                name: e.target.value,
+                              }; // Update the specific stage
+                              setStages(updatedStages); // Set the updated stages array
+                            }}
+                            placeholder="Stage Name"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          />
+                        </div>
+
+                        <div className="w-2/4">
+                          <input
+                            type="date"
+                            value={getFormattedDate(stage?.date)}
+                            onChange={(e) => {
+                              const updatedStages = [...stages]; // Create a shallow copy of stages
+                              updatedStages[index] = {
+                                ...stage,
+                                date: e.target.value,
+                              }; // Update the specific stage
+                              setStages(updatedStages); // Set the updated stages array
+                            }}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          />
+                        </div>
+                        <div className="w-1/5 py-2">
+                          <button
+                            onClick={removeStage(index)}
+                            className="flex items-center ml-2 bg-transparent hover:bg-red-500 text-red-700 font-semibold hover:text-white py-1 px-2 border border-red-500 hover:border-transparent rounded"
+                          >
+                            <Trash2 className="h-4 w-4 " />
+                          </button>
+                        </div>
                       </div>
-                      <div className="w-1/5 py-2 ">
-                        <button onClick={removeStage(index)} className="flex items-center ml-2 bg-transparent hover:bg-red-500 text-red-700 font-semibold hover:text-white py-1 px-2 border border-red-500 hover:border-transparent rounded"
-                        ><Trash2 className="h-4 w-4 " />
-                        </button>
-                      </div>
-                    </div>
-                  ))} */}
+                    ))}
 
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Curent Stage
-                  </label>
-                  <input
-                    type="text"
-                    value={editedContent?.stage}
-                    onChange={(e) =>
-                      setEditedContent({
-                        ...editedContent!,
-                        stage: e.target.value,
-                      })
-                    }
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  />
-                </div>
+                  {/* <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      Curent Stage
+                    </label>
+                    <input
+                      type="text"
+                      value={editedContent?.stage}
+                      onChange={(e) =>
+                        setEditedContent({
+                          ...editedContent!,
+                          stage: e.target.value,
+                        })
+                      }
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    />
+                  </div> */}
 
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    value={
-                      editedContent?.startdate
-                        ? editedContent.startdate.slice(0, 10)
-                        : ""
-                    }
-                    onChange={(e) =>
-                      setEditedContent({
-                        ...editedContent!,
-                        startdate: e.target.value,
-                      })
-                    }
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  />
-                </div>
+                  <div className="mt-4">
+                    <label className="block  text-sm font-medium text-gray-900 dark:text-white">
+                      Start Date
+                    </label>
+                    <input
+                      type="date"
+                      value={getFormattedDate(editedContent?.startdate)}
+                      onChange={(e) =>
+                        setEditedContent({
+                          ...editedContent!,
+                          startdate: e.target.value,
+                        })
+                      }
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    />
+                  </div>
 
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Estimated Completion
-                  </label>
-                  <input
-                    type="date"
-                    value={
-                      editedContent?.estimatedcompletion
-                        ? editedContent.estimatedcompletion.slice(0, 10)
-                        : ""
-                    }
-                    onChange={(e) =>
-                      setEditedContent({
-                        ...editedContent!,
-                        estimatedcompletion: e.target.value,
-                      })
-                    }
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  />
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <button
-                    onClick={handleSave}
-                    className="text-green-600 hover:text-green-700"
-                  >
-                    <Save className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={handleCancel}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
+                  <div className="mt-4 mb-4">
+                    <label className="block  text-sm font-medium text-gray-900 dark:text-white">
+                      Estimated Completion
+                    </label>
+                    <input
+                      type="date"
+                      value={getFormattedDate(
+                        editedContent?.estimatedcompletion
+                      )}
+                      onChange={(e) =>
+                        setEditedContent({
+                          ...editedContent!,
+                          estimatedcompletion: e.target.value,
+                        })
+                      }
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <button
+                      onClick={handleSave}
+                      className="text-green-600 hover:text-green-700"
+                    >
+                      <Save className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={handleCancel}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -297,9 +356,9 @@ export default function ProjectsEditor() {
                       <p className="text-sm text-primary-500">
                         {project.projectid}, VAT({project.vat})
                       </p>
-                      <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                      {/* <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                         {project.stage}
-                      </p>
+                      </p> */}
                       <div className="mt-2">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-primary-100 dark:bg-primary-900/20 text-primary-800 dark:text-primary-400">
                           {project.status.toUpperCase()}

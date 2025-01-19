@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Search, Package, Clock, CheckCircle } from "lucide-react";
+import { Search, Package, Clock, CheckCircle, BarChart3 } from "lucide-react";
 import { ProjectStatus, contentManager } from "../utils/contentManager";
 
 export default function ProjectTracking() {
@@ -40,6 +40,10 @@ export default function ProjectTracking() {
     }
   };
 
+  const getFormattedDate = (date?: string) => {
+    return date ? date.slice(0, 10) : "";
+  };
+
   return (
     <div className="pt-24 pb-16">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -50,9 +54,11 @@ export default function ProjectTracking() {
           <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
             Track your project's progress in real-time
             <br />
-            <span className="text-sm"> By entering Project Number, VAT Number (e.g., PRJ001, 12386857)</span>
+            <span className="text-sm">
+              {" "}
+              By entering Project Number, VAT Number (e.g., PRJ001, 12386857)
+            </span>
           </p>
-
         </div>
 
         <form onSubmit={handleSearch} className="mt-8">
@@ -96,12 +102,13 @@ export default function ProjectTracking() {
                     </span>
                   </h2>
                   <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${project.status === "completed"
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      project.status === "completed"
                         ? "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400"
                         : project.status === "in-progress"
-                          ? "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400"
-                          : "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400"
-                      }`}
+                        ? "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400"
+                        : "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400"
+                    }`}
                   >
                     {project.status.charAt(0).toUpperCase() +
                       project.status.slice(1)}
@@ -109,32 +116,71 @@ export default function ProjectTracking() {
                 </div>
               </div>
 
-              <div className="px-6 py-5">
+              <div className="px-6 py-5 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="flex items-center space-x-3">
-                    <Package className="h-6 w-6 text-primary-500" />
+                    <BarChart3 className="h-6 w-6 text-primary-500" />
                     <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Current Stage
-                      </p>
                       <p className="text-lg font-medium text-gray-900 dark:text-white">
-                        {project.stage}
+                        Estimated Completion
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center mx-auto space-x-3">
                     <Clock className="h-6 w-6 text-primary-500" />
                     <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Estimated Completion
-                      </p>
                       <p className="text-lg font-medium text-gray-900 dark:text-white">
-                        {project.estimatedcompletion}
+                        {getFormattedDate(project.estimatedcompletion)}
                       </p>
                     </div>
                   </div>
                 </div>
+                <hr />
+
+                {project.stages &&
+                  project.stages.map((stage, index) => (
+                    <div
+                      key={index}
+                      className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <Package
+                          className={`h-6 w-6 ${
+                            index % 2 !== 0
+                              ? "text-blue-500"
+                              : "text-primary-500"
+                          }`}
+                        />
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            Stage
+                          </p>
+                          <p className="text-lg font-medium text-gray-900 dark:text-white">
+                            {stage.name}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center mx-auto space-x-3 ">
+                        <Clock
+                          className={`h-6 w-6 ${
+                            index % 2 !== 0
+                              ? "text-blue-500"
+                              : "text-primary-500"
+                          }`}
+                        />
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            Progress Date
+                          </p>
+                          <p className="text-lg font-medium text-gray-900 dark:text-white">
+                            {getFormattedDate(stage.date)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
 
                 <div className="mt-6">
                   <div className="flex items-center justify-between mb-2">
