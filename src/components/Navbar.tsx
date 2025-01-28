@@ -92,7 +92,7 @@ export default function Navbar() {
               Track Project
             </Link>
             <button className="w-full mt-2 btn-primary">
-              Get Started
+              Get Started (Demo)
             </button>
           </div>
         </div>
