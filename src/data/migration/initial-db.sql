@@ -67,8 +67,8 @@ CREATE TABLE project_status (
   vat VARCHAR(255),
   status VARCHAR(20) CHECK (status IN ('queued', 'in-progress', 'completed')) NOT NULL,
   stage VARCHAR(255) NOT NULL,
-  startDate TIMESTAMP NOT NULL,
-  estimatedCompletion TIMESTAMP NOT NULL,
+  startdate TIMESTAMP NOT NULL,
+  estimatedcompletion TIMESTAMP NOT NULL,
   progress INTEGER CHECK (progress >= 0 AND progress <= 100) NOT NULL
 );
 
