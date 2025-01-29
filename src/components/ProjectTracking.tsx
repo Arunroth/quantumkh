@@ -56,7 +56,7 @@ export default function ProjectTracking() {
             <br />
             <span className="text-sm">
               {" "}
-              By entering Project Number, VAT Number (e.g., PRJ001, 12386857)
+              By entering "Project Number, VAT Number" (e.g., 250001, K00X-XXXXXXXXX)
             </span>
           </p>
         </div>
