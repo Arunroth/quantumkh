@@ -172,7 +172,7 @@ export default function ProjectTracking() {
                         />
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Progress Date
+                            Started Date
                           </p>
                           <p className="text-lg font-medium text-gray-900 dark:text-white">
                             {getFormattedDate(stage.date)}
