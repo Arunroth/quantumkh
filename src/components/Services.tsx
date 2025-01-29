@@ -30,7 +30,7 @@ export default function Services() {
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-semibold text-dark-900 dark:text-white">{service.name}</h3>
-                <p className="mt-2 text-gray-600 dark:text-gray-300">{service.description}</p>
+                <p className="mt-2 text-gray-600 dark:text-gray-300"  style={{ whiteSpace: "pre-line" }}>{service.description}</p>
                 <div className="mt-4">
                   <a
                     href="#"
