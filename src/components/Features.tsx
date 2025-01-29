@@ -19,7 +19,7 @@ export default function Features() {
             Industrial Excellence
           </h2>
           <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
-            Cutting-edge manufacturing solutions powered by innovation
+            Cutting-edge manufacturing solutions powered by innovation!
           </p>
         </div>
 
