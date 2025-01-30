@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Search, Package, Clock, CheckCircle, BarChart3 } from "lucide-react";
+import { Search, Package, Clock, CheckCircle } from "lucide-react";
 import { ProjectStatus, contentManager } from "../utils/contentManager";
 
 export default function ProjectTracking() {
@@ -7,7 +7,6 @@ export default function ProjectTracking() {
   const [projectData, setProjectData] = useState<ProjectStatus[]>();
   const [error, setError] = useState("");
 
-  // Fetch the projectId from localStorage when the component mounts
   useEffect(() => {
     const fetchClients = async (ids: string) => {
       try {
@@ -29,13 +28,11 @@ export default function ProjectTracking() {
     setError("");
 
     const statuses = await contentManager.getProjectStatusById(projectId);
-    if (statuses && statuses.length != 0) {
+    if (statuses && statuses.length !== 0) {
       setProjectData(statuses);
       localStorage.setItem("projectIds", projectId);
     } else {
-      setError(
-        "Project not found. Please check the project number and VAT and try again."
-      );
+      setError("Project not found. Please check the project number and VAT and try again.");
       setProjectData([]);
     }
   };
@@ -48,16 +45,11 @@ export default function ProjectTracking() {
     <div className="pt-24 pb-16">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
-            Project Tracking
-          </h1>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Project Tracking</h1>
           <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
             Track your project's progress in real-time
             <br />
-            <span className="text-sm">
-              {" "}
-              By entering "Project Number, VAT Number" (e.g., 250001, K00X-XXXXXXXXX)
-            </span>
+            <span className="text-sm">By entering "Project Number, VAT Number" (e.g., PRJ001, 12386857)</span>
           </p>
         </div>
 
@@ -75,9 +67,7 @@ export default function ProjectTracking() {
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md leading-5 bg-white dark:bg-dark-900 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               />
             </div>
-            <button type="submit" className="btn-primary">
-              Track Project
-            </button>
+            <button type="submit" className="btn-primary">Track Project</button>
           </div>
         </form>
 
@@ -87,129 +77,81 @@ export default function ProjectTracking() {
           </div>
         )}
 
-        {projectData &&
-          projectData.map((project) => (
-            <div
-              key={project.id}
-              className="mt-8 bg-white dark:bg-dark-800 shadow rounded-lg overflow-hidden"
-            >
-              <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    {project.name}{" "}
-                    <span className="text-sm text-gray-400">
-                      {project.projectid}
-                    </span>
-                  </h2>
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      project.status === "completed"
-                        ? "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400"
-                        : project.status === "in-progress"
-                        ? "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400"
-                        : "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400"
-                    }`}
-                  >
-                    {project.status.charAt(0).toUpperCase() +
-                      project.status.slice(1)}
-                  </span>
-                </div>
-              </div>
-
-              <div className="px-6 py-5 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="flex items-center space-x-3">
-                    <BarChart3 className="h-6 w-6 text-primary-500" />
-                    <div>
-                      <p className="text-lg font-medium text-gray-900 dark:text-white">
-                        Estimated Completion
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center mx-auto space-x-3">
-                    <Clock className="h-6 w-6 text-primary-500" />
-                    <div>
-                      <p className="text-lg font-medium text-gray-900 dark:text-white">
-                        {getFormattedDate(project.estimatedcompletion)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <hr />
-
-                {project.stages &&
-                  project.stages.map((stage, index) => (
-                    <div
-                      key={index}
-                      className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <Package
-                          className={`h-6 w-6 ${
-                            index % 2 !== 0
-                              ? "text-blue-500"
-                              : "text-primary-500"
-                          }`}
-                        />
-                        <div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Stage
-                          </p>
-                          <p className="text-lg font-medium text-gray-900 dark:text-white">
-                            {stage.name}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center mx-auto space-x-3 ">
-                        <Clock
-                          className={`h-6 w-6 ${
-                            index % 2 !== 0
-                              ? "text-blue-500"
-                              : "text-primary-500"
-                          }`}
-                        />
-                        <div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Started Date
-                          </p>
-                          <p className="text-lg font-medium text-gray-900 dark:text-white">
-                            {getFormattedDate(stage.date)}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                <div className="mt-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      Progress
-                    </span>
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      {project.progress}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                    <div
-                      className="bg-primary-500 h-2.5 rounded-full transition-all duration-500"
-                      style={{ width: `${project.progress}%` }}
-                    ></div>
-                  </div>
-                </div>
-
-                {project.status === "completed" && (
-                  <div className="mt-6 flex items-center justify-center p-4 bg-green-50 dark:bg-green-900/20 rounded-md">
-                    <CheckCircle className="h-6 w-6 text-green-500 mr-2" />
-                    <span className="text-green-700 dark:text-green-400">
-                      Project completed successfully!
-                    </span>
-                  </div>
-                )}
+        {projectData && projectData.map((project) => (
+          <div key={project.id} className="mt-8 bg-white dark:bg-dark-800 shadow rounded-lg overflow-hidden">
+            <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  {project.name}{" "}
+                  <span className="text-sm text-gray-400">{project.projectid}</span>
+                </h2>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  project.status === "completed"
+                    ? "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400"
+                    : project.status === "in-progress"
+                    ? "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400"
+                    : "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400"
+                }`}>
+                  {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+                </span>
               </div>
             </div>
-          ))}
+
+            {/* Timeline Progress Section */}
+            <div className="px-6 py-5">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Project Timeline</h3>
+              <div className="flex flex-col space-y-6">
+                {project.stages &&
+                  project.stages
+                    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                    .map((stage, index) => (
+                      <div key={index} className="flex items-start space-x-4 relative">
+                        <div className="relative flex flex-col items-center">
+                          <div className={`h-6 w-6 rounded-full flex items-center justify-center ${
+                            index === project.stages.length - 1 ? "bg-green-500 text-white" : "bg-primary-500 text-white"
+                          }`}>
+                            <Package className="h-4 w-4" />
+                          </div>
+                          {index !== project.stages.length - 1 && (
+                            <div className="w-0.5 h-6 bg-gray-400 dark:bg-gray-600 mt-1"></div>
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{getFormattedDate(stage.date)}</p>
+                          <p className="text-lg font-medium text-gray-900 dark:text-white">{stage.name}</p>
+                        </div>
+                      </div>
+                    ))}
+              </div>
+
+              {/* Estimated Completion Date - Hide if Project is Completed */}
+              {project.status !== "completed" && project.estimatedcompletion && (
+                <div className="mt-8 flex items-center justify-center bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-md">
+                  <Clock className="h-6 w-6 text-yellow-500 mr-2" />
+                  <span className="text-yellow-700 dark:text-yellow-400 text-lg font-medium">
+                    Estimated Completion: {getFormattedDate(project.estimatedcompletion)}
+                  </span>
+                </div>
+              )}
+
+              {/* Progress Bar - Override to 100% if Completed */}
+              <div className="mt-6">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">Progress</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    {project.status === "completed" ? "100%" : `${project.progress}%`}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                  <div
+                    className="bg-primary-500 h-2.5 rounded-full transition-all duration-500"
+                    style={{ width: project.status === "completed" ? "100%" : `${project.progress}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
