@@ -49,7 +49,7 @@ export default function ProjectTracking() {
           <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
             Track your project's progress in real-time
             <br />
-            <span className="text-sm">By entering "Project Number, VAT Number" (e.g., PRJ001, 12386857)</span>
+            <span className="text-sm">By entering "Project Number, VAT Number" (e.g., 250001 , L001-xxxxxxxxx)</span>
           </p>
         </div>
 
