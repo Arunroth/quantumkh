@@ -2,7 +2,7 @@ import { Menu, X, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
-import logoImage from '../assets/logo.png';
+import logoImage from '../assets/main_logo.png';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
