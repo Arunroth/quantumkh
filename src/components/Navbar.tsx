@@ -17,7 +17,7 @@ export default function Navbar() {
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
               <img src={logoImage} alt="Company Logo" className="h-12 md:h-10 w-auto" />
-              <span className="hidden md:inline text-xl font-bold text-dark-900 dark:text-white">Quantum E&M</span>
+              {/* <span className="hidden md:inline text-xl font-bold text-dark-900 dark:text-white">Quantum E&M</span> */}
             </Link>
           </div>
           
