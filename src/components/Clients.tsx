@@ -5,52 +5,36 @@ export default function Clients() {
   const { clients } = useContent();
   const sliderRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
-  const [isUserScrolling, setIsUserScrolling] = useState(false);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const resumeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [scrollDuration, setScrollDuration] = useState(28.5); // Default speed (30% slower)
 
   useEffect(() => {
     const slider = sliderRef.current;
-    if (!slider || isPaused || isUserScrolling) return;
+    if (!slider) return;
 
-    let scrollSpeed = 50; // Speed in pixels per second
-    let start = Date.now();
-    let requestId: number;
-
-    const autoScroll = () => {
-      let timeElapsed = (Date.now() - start) / 1000;
-      slider.scrollLeft += (scrollSpeed * timeElapsed) / 60;
-
-      requestId = requestAnimationFrame(autoScroll);
+    // Dynamically adjust scroll speed based on content width
+    const updateScrollSpeed = () => {
+      const contentWidth = slider.scrollWidth / 2; // Half because of duplicated content
+      const baseSpeed = 28.5; // Default speed for a typical number of clients
+      const speedPerPixel = baseSpeed / 1000; // Adjust per pixel width
+      setScrollDuration(contentWidth * speedPerPixel);
     };
 
-    requestId = requestAnimationFrame(autoScroll);
-    return () => cancelAnimationFrame(requestId);
-  }, [isPaused, isUserScrolling]);
+    updateScrollSpeed(); // Call once on load
 
-  // Detect when the user scrolls manually
-  const handleUserScroll = () => {
-    setIsUserScrolling(true);
-    if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    // Pause animation when hovered
+    const handleMouseEnter = () => setIsPaused(true);
+    const handleMouseLeave = () => setIsPaused(false);
 
-    // Resume auto-scroll after 3s of inactivity
-    scrollTimeoutRef.current = setTimeout(() => {
-      setIsUserScrolling(false);
-    }, 3000);
-  };
+    slider.addEventListener("mouseenter", handleMouseEnter);
+    slider.addEventListener("mouseleave", handleMouseLeave);
+    window.addEventListener("resize", updateScrollSpeed); // Adjust speed on resize
 
-  // Pause auto-scroll on hover
-  const handleMouseEnter = () => {
-    setIsPaused(true);
-    if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
-  };
-
-  // Resume auto-scroll 0.5s after mouse leaves
-  const handleMouseLeave = () => {
-    resumeTimeoutRef.current = setTimeout(() => {
-      setIsPaused(false);
-    }, 500);
-  };
+    return () => {
+      slider.removeEventListener("mouseenter", handleMouseEnter);
+      slider.removeEventListener("mouseleave", handleMouseLeave);
+      window.removeEventListener("resize", updateScrollSpeed);
+    };
+  }, [clients]);
 
   return (
     <div className="bg-gray-50 dark:bg-dark-800 py-24 transition-colors w-full">
@@ -65,24 +49,14 @@ export default function Clients() {
         </div>
 
         {/* Auto-scrolling slider */}
-        <div
-          className="mt-12 relative w-full overflow-hidden"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          onScroll={handleUserScroll}
-          style={{ cursor: "grab", whiteSpace: "nowrap" }}
-        >
+        <div className="mt-12 relative w-full overflow-hidden" ref={sliderRef}>
           <div
-            ref={sliderRef}
-            className="flex space-x-6"
-            style={{
-              display: "flex",
-              animation: isPaused || isUserScrolling ? "none" : "scrolling 20s linear infinite",
-            }}
+            className={`flex space-x-6 w-max ${isPaused ? "paused" : "scrolling"}`}
+            style={{ animationDuration: `${scrollDuration}s` }} // Dynamic speed
           >
-            {clients.map((client, index) => (
+            {clients.concat(clients).map((client, index) => ( // Duplicate for infinite scrolling
               <div
-                key={client.id}
+                key={client.id + "-" + index}
                 className="flex-none w-56 bg-white dark:bg-dark-900 rounded-lg p-4 shadow-md"
               >
                 <div className="flex items-center justify-center h-20 mb-3">
@@ -108,37 +82,19 @@ export default function Clients() {
           </div>
         </div>
 
-        {/* 3-Column Grid of Images on Small Screens */}
-        <div className="mt-12 grid grid-cols-3 gap-4 sm:hidden place-items-center">
-          {clients.map((client, index) => {
-            const isLastRowSingle = (clients.length % 3 === 1) && (index === clients.length - 1);
-            const isLastRowTwo = (clients.length % 3 === 2) && (index >= clients.length - 2);
-
-            return (
-              <div
-                key={client.id}
-                className={`flex justify-center items-center ${
-                  isLastRowSingle ? "col-span-3 flex justify-center" : ""
-                } ${
-                  isLastRowTwo ? "col-span-2 flex justify-center" : ""
-                }`}
-              >
-                <img className="h-16 object-contain" src={client.logo} alt={client.name} />
-              </div>
-            );
-          })}
-        </div>
-
-        {/* CSS for Smooth Infinite Scrolling */}
+        {/* CSS for Infinite Scrolling (Dynamic Speed Applied via JS) */}
         <style>
           {`
-            @keyframes scrolling {
-              from {
-                transform: translateX(0);
-              }
-              to {
-                transform: translateX(-100%);
-              }
+            @keyframes scroll {
+              from { transform: translateX(0); }
+              to { transform: translateX(-50%); }
+            }
+            .scrolling {
+              display: flex;
+              animation: scroll linear infinite;
+            }
+            .paused {
+              animation-play-state: paused;
             }
           `}
         </style>
