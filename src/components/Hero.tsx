@@ -23,9 +23,9 @@ export default function Hero() {
                 Start Your Project
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
-              <button className="btn-secondary">
+              <Link to="/services" className="btn-secondary">
                 Explore Services
-              </button>
+              </Link>
             </div>
           </div>
           <div className="relative">

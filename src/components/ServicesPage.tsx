@@ -1,5 +1,6 @@
 import { ArrowRight, Settings, Clock, Shield, Wrench } from 'lucide-react';
 import { useContent } from '../context/ContentContext';
+import {Link} from "react-router-dom";
 
 export default function ServicesPage() {
   const { services } = useContent();
@@ -66,10 +67,6 @@ export default function ServicesPage() {
                 <p className="text-gray-600 dark:text-gray-300 mb-4" style={{ whiteSpace: "pre-line" }}>
                   {service.description}
                 </p>
-                <button className="btn-primary">
-                  Learn More
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </button>
               </div>
             </div>
           ))}
@@ -115,9 +112,9 @@ export default function ServicesPage() {
             <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
               Contact us today to discuss your manufacturing needs and get a custom quote
             </p>
-            <button className="bg-white text-primary-600 hover:bg-gray-100 px-8 py-3 rounded-md font-semibold transition-colors">
+            <Link  to="/not-implemented" className="bg-white text-primary-600 hover:bg-gray-100 px-8 py-3 rounded-md font-semibold transition-colors">
               Get Started
-            </button>
+            </Link>
           </div>
         </div>
       </div>

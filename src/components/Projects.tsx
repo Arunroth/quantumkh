@@ -48,10 +48,6 @@ export default function Projects() {
                   <span className="text-sm text-gray-500 dark:text-gray-400">
                     Category: {project.category}
                   </span>
-                  <button className="inline-flex items-center text-primary-500 hover:text-primary-600">
-                    View Details
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </button>
                 </div>
               </div>
             </div>

@@ -16,18 +16,13 @@ export default function Machines() {
 
         <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {machines.map((machine) => (
-            <div key={machine.id} className="bg-white dark:bg-dark-900 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-              <div className="relative h-64">
+            <div key={machine.id} className="bg-white cursor-auto dark:bg-dark-900 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div className="relative h-64 ">
                 <img
                   src={machine.image}
                   alt={machine.name}
                   className="w-full h-full object-contain mix-blend-normal dark:filter-none"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                  <button className="btn-primary">
-                    View Details
-                  </button>
-                </div>
               </div>
 
               <div className="p-6">

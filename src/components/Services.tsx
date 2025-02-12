@@ -32,24 +32,6 @@ export default function Services() {
                 <h3 className="text-xl font-semibold text-dark-900 dark:text-white">{service.name}</h3>
                 <p className="mt-2 text-gray-600 dark:text-gray-300"  style={{ whiteSpace: "pre-line" }}>{service.description}</p>
                 <div className="mt-4">
-                  <a
-                    href="#"
-                    className="text-primary-500 hover:text-primary-600 dark:text-primary-400 dark:hover:text-primary-300 font-medium inline-flex items-center"
-                  >
-                    Learn more
-                    <svg
-                      className="ml-2 h-5 w-5"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </a>
                 </div>
               </div>
             </div>

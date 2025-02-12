@@ -1,31 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Edit2, Trash2, Plus } from 'lucide-react';
 import { contentManager, Service } from '../../utils/contentManager';
-
-const initialServices = [
-  {
-    id: 1,
-    name: 'CNC Machining',
-    description: 'High-precision parts manufacturing',
-    status: 'Active',
-    image: 'https://images.unsplash.com/photo-1565962768804-b667f1d18a55?auto=format&fit=crop&q=80'
-  },
-  {
-    id: 2,
-    name: '3D Printing',
-    description: 'Rapid prototyping solutions',
-    status: 'Active',
-    image: 'https://images.unsplash.com/photo-1631468182740-de6e6ee1dc66?auto=format&fit=crop&q=80'
-  },
-  {
-    id: 3,
-    name: 'Injection Molding',
-    description: 'Mass production capabilities',
-    status: 'Active',
-    image: 'https://images.unsplash.com/photo-1581091226825-c6a89e7e4801?auto=format&fit=crop&q=80'
-  },
-];
-
 export default function ServicesManager() {
   const [services, setServices] = useState<Service[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -38,7 +38,7 @@ export default function Clients() {
 
   return (
     <div className="bg-gray-50 dark:bg-dark-800 py-24 transition-colors w-full">
-      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-screen-xl  mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
             Trusted by Industry Leaders
@@ -49,7 +49,7 @@ export default function Clients() {
         </div>
 
         {/* Auto-scrolling slider */}
-        <div className="mt-12 relative w-full overflow-hidden" ref={sliderRef}>
+        <div className="mt-12 relative w-full overflow-hidden scroll-smooth" ref={sliderRef}>
           <div
             className={`flex space-x-6 w-max ${isPaused ? "paused" : "scrolling"}`}
             style={{ animationDuration: scrollDuration }} // Dynamic animation speed
@@ -57,9 +57,9 @@ export default function Clients() {
             {clients.concat(clients).map((client, index) => ( // Duplicate for infinite scrolling
               <div
                 key={client.id + "-" + index}
-                className="flex-none w-56 bg-white dark:bg-dark-900 rounded-lg p-4 shadow-md"
+                className="flex-none w-56 bg-white  mb-4 dark:bg-dark-900 rounded-lg p-4 shadow-md"
               >
-                <div className="flex items-center justify-center h-20 mb-3">
+                <div className="flex  items-center justify-center h-20 mb-3">
                   <img
                     className="h-14 object-contain"
                     src={client.logo}
