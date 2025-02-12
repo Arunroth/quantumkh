@@ -5,21 +5,21 @@ export default function Clients() {
   const { clients } = useContent();
   const sliderRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
-  const [scrollDuration, setScrollDuration] = useState(28.5); // Default speed (30% slower)
+  const [scrollDuration, setScrollDuration] = useState("30s"); // Default duration
 
   useEffect(() => {
     const slider = sliderRef.current;
     if (!slider) return;
 
-    // Dynamically adjust scroll speed based on content width
+    // Function to update scroll speed dynamically
     const updateScrollSpeed = () => {
       const contentWidth = slider.scrollWidth / 2; // Half because of duplicated content
-      const baseSpeed = 28.5; // Default speed for a typical number of clients
-      const speedPerPixel = baseSpeed / 1000; // Adjust per pixel width
-      setScrollDuration(contentWidth * speedPerPixel);
+      const speedPerPixel = 0.01; // Adjust this value to control the speed per pixel
+      const newDuration = `${contentWidth * speedPerPixel}s`; // Duration scales with content width
+      setScrollDuration(newDuration);
     };
 
-    updateScrollSpeed(); // Call once on load
+    updateScrollSpeed(); // Run once on load
 
     // Pause animation when hovered
     const handleMouseEnter = () => setIsPaused(true);
@@ -27,7 +27,7 @@ export default function Clients() {
 
     slider.addEventListener("mouseenter", handleMouseEnter);
     slider.addEventListener("mouseleave", handleMouseLeave);
-    window.addEventListener("resize", updateScrollSpeed); // Adjust speed on resize
+    window.addEventListener("resize", updateScrollSpeed); // Update speed on window resize
 
     return () => {
       slider.removeEventListener("mouseenter", handleMouseEnter);
@@ -52,7 +52,7 @@ export default function Clients() {
         <div className="mt-12 relative w-full overflow-hidden" ref={sliderRef}>
           <div
             className={`flex space-x-6 w-max ${isPaused ? "paused" : "scrolling"}`}
-            style={{ animationDuration: `${scrollDuration}s` }} // Dynamic speed
+            style={{ animationDuration: scrollDuration }} // Dynamic animation speed
           >
             {clients.concat(clients).map((client, index) => ( // Duplicate for infinite scrolling
               <div
@@ -82,7 +82,7 @@ export default function Clients() {
           </div>
         </div>
 
-        {/* CSS for Infinite Scrolling (Dynamic Speed Applied via JS) */}
+        {/* CSS for Infinite Scrolling (Speed Adjusted Dynamically) */}
         <style>
           {`
             @keyframes scroll {
