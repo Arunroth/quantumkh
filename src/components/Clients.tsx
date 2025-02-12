@@ -5,22 +5,23 @@ export default function Clients() {
   const { clients } = useContent();
   const sliderRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const [isManualScrolling, setIsManualScrolling] = useState(false);
 
-  // Double the clients list to create a looping effect
+  // Duplicate clients to create a seamless loop for horizontal scrolling
   const extendedClients = [...clients, ...clients];
 
   useEffect(() => {
     const slider = sliderRef.current;
-    if (!slider) return;
+    if (!slider || isManualScrolling) return;
 
-    let scrollSpeed = 2; // Pixels per frame
+    let scrollSpeed = 1.5; // Pixels per frame
     let requestId: number;
 
     const autoScroll = () => {
       if (!isPaused) {
         slider.scrollLeft += scrollSpeed;
         if (slider.scrollLeft >= slider.scrollWidth / 2) {
-          slider.scrollLeft = 0; // Reset scroll for infinite effect
+          slider.scrollLeft = 0;
         }
       }
       requestId = requestAnimationFrame(autoScroll);
@@ -29,7 +30,13 @@ export default function Clients() {
     requestId = requestAnimationFrame(autoScroll);
 
     return () => cancelAnimationFrame(requestId);
-  }, [isPaused]);
+  }, [isPaused, isManualScrolling]);
+
+  // Handle manual scrolling by user
+  const handleUserScroll = () => {
+    setIsManualScrolling(true);
+    setTimeout(() => setIsManualScrolling(false), 3000); // Resume auto-scroll after 3 sec
+  };
 
   return (
     <div className="bg-gray-50 dark:bg-dark-800 py-24 transition-colors">
@@ -43,18 +50,21 @@ export default function Clients() {
           </p>
         </div>
 
-        {/* Auto-scrolling slider */}
+        {/* Auto-scrolling & manually scrollable slider (Desktop & Tablets) */}
         <div
-          className="mt-12 relative overflow-hidden"
+          className="mt-12 relative overflow-x-auto hide-scrollbar hidden sm:block"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
+          onScroll={handleUserScroll}
         >
           <div
             ref={sliderRef}
             className="flex space-x-6 whitespace-nowrap"
             style={{
               display: "flex",
-              animation: isPaused ? "none" : "scrolling 20s linear infinite",
+              animation: isPaused || isManualScrolling ? "none" : "scrolling 20s linear infinite",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
             }}
           >
             {extendedClients.map((client, index) => (
@@ -85,18 +95,40 @@ export default function Clients() {
           </div>
         </div>
 
-        {/* CSS Animation for smooth scrolling */}
-        <style jsx>{`
-          @keyframes scrolling {
-            from {
-              transform: translateX(0);
-            }
-            to {
-              transform: translateX(-50%);
-            }
-          }
-        `}</style>
+        {/* 3-Column Grid of Images on Small Screens */}
+        <div className="mt-12 grid grid-cols-3 gap-4 sm:hidden">
+          {clients.map((client, index) => {
+            const isLastRowSingle = (clients.length % 3 === 1) && (index === clients.length - 1);
+            const isLastRowTwo = (clients.length % 3 === 2) && (index >= clients.length - 2);
 
+            return (
+              <div
+                key={client.id}
+                className={`flex justify-center items-center ${
+                  isLastRowSingle ? "col-span-3 flex justify-center" : "" // Center last single item
+                } ${
+                  isLastRowTwo ? "col-span-2 flex justify-center" : "" // Center last two items
+                }`}
+              >
+                <img className="h-16 object-contain" src={client.logo} alt={client.name} />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Inline Styles to Fix Auto-Scrolling */}
+        <style>
+          {`
+            @keyframes scrolling {
+              from {
+                transform: translateX(0);
+              }
+              to {
+                transform: translateX(-50%);
+              }
+            }
+          `}
+        </style>
       </div>
     </div>
   );
