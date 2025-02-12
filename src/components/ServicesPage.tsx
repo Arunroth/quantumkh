@@ -62,7 +62,10 @@ export default function ServicesPage() {
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                   {service.name}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">{service.description}</p>
+                {/* ✅ FIX: Ensure new lines display correctly */}
+                <p className="text-gray-600 dark:text-gray-300 mb-4" style={{ whiteSpace: "pre-line" }}>
+                  {service.description}
+                </p>
                 <button className="btn-primary">
                   Learn More
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -87,7 +90,10 @@ export default function ServicesPage() {
                   {service.name}
                 </h3>
               </div>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">{service.description}</p>
+              {/* ✅ FIX: Ensure new lines display correctly */}
+              <p className="text-gray-600 dark:text-gray-300 mb-4" style={{ whiteSpace: "pre-line" }}>
+                {service.description}
+              </p>
               <ul className="space-y-2">
                 {service.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-center text-gray-600 dark:text-gray-300">
