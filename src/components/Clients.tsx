@@ -5,40 +5,55 @@ export default function Clients() {
   const { clients } = useContent();
   const sliderRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
-  const [scrollDuration, setScrollDuration] = useState("30s"); // Default duration
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
 
   useEffect(() => {
     const slider = sliderRef.current;
     if (!slider) return;
 
-    // Function to update scroll speed dynamically
-    const updateScrollSpeed = () => {
-      const contentWidth = slider.scrollWidth / 2; // Half because of duplicated content
-      const speedPerPixel = 0.01; // Adjust this value to control the speed per pixel
-      const newDuration = `${contentWidth * speedPerPixel}s`; // Duration scales with content width
-      setScrollDuration(newDuration);
-    };
-
-    updateScrollSpeed(); // Run once on load
-
-    // Pause animation when hovered
+    // Pause auto-scroll on hover
     const handleMouseEnter = () => setIsPaused(true);
     const handleMouseLeave = () => setIsPaused(false);
 
     slider.addEventListener("mouseenter", handleMouseEnter);
     slider.addEventListener("mouseleave", handleMouseLeave);
-    window.addEventListener("resize", updateScrollSpeed); // Update speed on window resize
 
     return () => {
       slider.removeEventListener("mouseenter", handleMouseEnter);
       slider.removeEventListener("mouseleave", handleMouseLeave);
-      window.removeEventListener("resize", updateScrollSpeed);
     };
-  }, [clients]);
+  }, []);
+
+  // Dragging logic
+  const handleMouseDown = (e: React.MouseEvent) => {
+    const slider = sliderRef.current;
+    if (!slider) return;
+
+    setIsDragging(true);
+    setStartX(e.pageX - slider.offsetLeft);
+    setScrollLeft(slider.scrollLeft);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+
+    const slider = sliderRef.current;
+    if (!slider) return;
+
+    const x = e.pageX - slider.offsetLeft;
+    const walk = (x - startX) * 1.5; // Speed factor
+    slider.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
 
   return (
     <div className="bg-gray-50 dark:bg-dark-800 py-24 transition-colors w-full">
-      <div className="max-w-screen-xl  mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
             Trusted by Industry Leaders
@@ -48,18 +63,26 @@ export default function Clients() {
           </p>
         </div>
 
-        {/* Auto-scrolling slider */}
-        <div className="mt-12 relative w-full overflow-hidden scroll-smooth" ref={sliderRef}>
+        {/* Auto-scrolling & draggable slider */}
+        <div
+          className="mt-12 relative w-full overflow-hidden cursor-grab active:cursor-grabbing"
+          ref={sliderRef}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+        >
           <div
-            className={`flex space-x-6 w-max ${isPaused ? "paused" : "scrolling"}`}
-            style={{ animationDuration: scrollDuration }} // Dynamic animation speed
+            className={`flex space-x-6 w-max scrolling-container ${
+              isPaused ? "paused" : ""
+            }`}
           >
-            {clients.concat(clients).map((client, index) => ( // Duplicate for infinite scrolling
+            {clients.concat(clients).map((client, index) => (
               <div
                 key={client.id + "-" + index}
-                className="flex-none w-56 bg-white  mb-4 dark:bg-dark-900 rounded-lg p-4 shadow-md"
+                className="flex-none w-56 bg-white dark:bg-dark-900 rounded-lg p-4 shadow-md"
               >
-                <div className="flex  items-center justify-center h-20 mb-3">
+                <div className="flex items-center justify-center h-20 mb-3">
                   <img
                     className="h-14 object-contain"
                     src={client.logo}
@@ -82,16 +105,17 @@ export default function Clients() {
           </div>
         </div>
 
-        {/* CSS for Infinite Scrolling (Speed Adjusted Dynamically) */}
+        {/* CSS for Infinite Scrolling & Drag */}
         <style>
           {`
             @keyframes scroll {
               from { transform: translateX(0); }
               to { transform: translateX(-50%); }
             }
-            .scrolling {
+            .scrolling-container {
               display: flex;
-              animation: scroll linear infinite;
+              animation: scroll 30s linear infinite;
+              will-change: transform;
             }
             .paused {
               animation-play-state: paused;
