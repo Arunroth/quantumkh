@@ -9,7 +9,8 @@
       "category": "Automotive",
       "completion": "2024",
       "ispublic": true,
-      "sku": "PJR-001"
+      "sku": "PJR-001",
+      "range": 1
     }
   ]
 }

@@ -44,15 +44,16 @@ export default function ClientsEditor() {
             testimonial: "",
             author: "admin",
             role: "",
-            range: 1,
+            range: clients[clients.length - 1].range + 1
         };
         const newClients = await addClient(newClient);
         setRecentClients(newClients);
     };
 
-    const handleDelete = (id: string) => {
+    const handleDelete = async (id: string) => {
         if (window.confirm("Are you sure you want to delete this client?")) {
-            deleteClient(id);
+            const deletedItems = await deleteClient(id);
+            setRecentClients(deletedItems);
         }
     };
 
@@ -88,18 +89,17 @@ export default function ClientsEditor() {
             transition,
             padding: "16px",
             margin: "8px",
-            backgroundColor: "#f0f0f0",
+            backgroundColor: "#fdfdfc",
             borderRadius: "8px",
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
-            cursor: "grab",
+            justifyContent: "center"
         };
         return (
             <div
                 key={client.id}
                 className="border dark:border-gray-700 rounded-lg overflow-hidden"
-                ref={setNodeRef} style={style} {...attributes} {...listeners}
+                ref={setNodeRef} style={style}
             >
                 {editingId === client.id ? (
                     <div className="p-4 space-y-4">
@@ -248,7 +248,8 @@ export default function ClientsEditor() {
                         <div className="p-4">
                             <div className="flex justify-between items-start">
                                 <div className="flex-1">
-                                    <div className="h-24 flex items-center justify-center mb-4">
+                                    <div {...attributes} {...listeners}
+                                         className="h-24 cursor-grab  flex items-center justify-center mb-4">
                                         <img
                                             src={client.logo}
                                             alt={client.name}
@@ -324,11 +325,9 @@ export default function ClientsEditor() {
 
             <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                 <SortableContext items={recentClients.map((item) => item.id)} strategy={verticalListSortingStrategy}>
-                    <div style={{display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px"}}>
-                        {/*<div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">*/}
+                    <div style={{display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px"}}>
                         {recentClients.map((client: Client) => (
                             <ClientCard key={client.id} id={client.id} client={client}></ClientCard>
-                            // <DraggableCard key={client.id} id={client.id} content={client.name}></DraggableCard>
                         ))}
                     </div>
                 </SortableContext>

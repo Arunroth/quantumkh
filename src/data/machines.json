@@ -9,7 +9,8 @@
       "speed": "12,000 RPM",
       "accuracy": "±0.0002\"",
       "materials": "Metals, Plastics",
-      "description": "High-speed vertical machining center perfect for precision parts manufacturing."
+      "description": "High-speed vertical machining center perfect for precision parts manufacturing.",
+      "range": 1
     }
   ]
 }

@@ -33,7 +33,8 @@ CREATE TABLE machines (
     speed VARCHAR(255) NOT NULL,
     accuracy VARCHAR(255) NOT NULL,
     materials TEXT,
-    description TEXT
+    description TEXT,
+    range INT NOT NULL
 );
 
 -- Project Table
@@ -44,7 +45,8 @@ CREATE TABLE projects (
     description TEXT ,
     image VARCHAR(255) NOT NULL,
     category VARCHAR(255) NOT NULL,
-    completion VARCHAR(255) NOT NULL
+    completion VARCHAR(255) NOT NULL,
+    range INT NOT NULL
 );
 
 -- Client Table

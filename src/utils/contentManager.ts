@@ -65,6 +65,7 @@ export interface Machine {
   accuracy: string;
   materials: string;
   description: string;
+  range: number;
 }
 
 export interface Project {
@@ -75,6 +76,7 @@ export interface Project {
   image: string;
   category: string;
   completion: string;
+  range: number;
 }
 
 export interface Client {
@@ -241,7 +243,7 @@ class ContentManager {
   async getMachines(): Promise<Machine[]> {
     const { data, error } = await supabase
       .from('machines')
-      .select('*'); // Fetch all columns
+      .select('*').order('range', { ascending: true }); // Fetch all columns
 
     if (error) {
       console.error('Error fetching services:', error);
@@ -260,10 +262,10 @@ class ContentManager {
     } else {
       this.machines.push(data[0]);
     }
-    return this.machines;
+    return this.machines.sort((a, b) => a.range - b.range);
   }
 
-  async updateMachine(id: string, machine: Partial<Machine>): Promise<Machine | null> {
+  async updateMachine(id: string, machine: Partial<Machine>): Promise<Machine[]> {
     const { error } = await supabase
       .from('machines')
       .update(machine)
@@ -272,13 +274,13 @@ class ContentManager {
       console.error('Error updating machine:', error);
     }
     const index = this.machines.findIndex(m => m.id === id);
-    if (index === -1) return null;
-
-    this.machines[index] = { ...this.machines[index], ...machine };
-    return this.machines[index];
+    if (index != -1) {
+        this.machines[index] = { ...this.machines[index], ...machine };
+    }
+    return this.machines.sort((a, b) => a.range - b.range);
   }
 
-  async deleteMachine(id: string): Promise<boolean> {
+  async deleteMachine(id: string): Promise<Machine[]> {
     const { data, error } = await supabase
       .from('machines')
       .delete()
@@ -290,24 +292,24 @@ class ContentManager {
       console.log('Service deleted:', data);
     }
     const index = this.machines.findIndex(m => m.id === id);
-    if (index === -1) return false;
-
-    this.machines.splice(index, 1);
-    return true;
+    if (index != -1){
+        this.machines.splice(index, 1);
+    }
+    return this.machines.sort((a, b) => a.range - b.range);
   }
 
   // Projects
   async getProjects(): Promise<Project[]> {
     const { data, error } = await supabase
       .from('projects')
-      .select('*'); // Fetch all columns
+      .select('*').order('range', { ascending: true }); // Fetch all columns
 
     if (error) {
       console.error('Error fetching projects:', error);
     } else {
       this.projects = data as Project[]; // Return typed data
     }
-    return this.projects;
+    return this.projects
   }
 
   async addProject(project: Omit<Project, 'id'>): Promise<Project[]> {
@@ -319,10 +321,10 @@ class ContentManager {
     } else {
       this.projects.push(data[0]);
     }
-    return this.projects;
+    return this.projects.sort((a, b) => a.range - b.range);
   }
 
-  async updateProject(id: string, project: Partial<Project>): Promise<Project | null> {
+  async updateProject(id: string, project: Partial<Project>): Promise<Project[]> {
     const { error } = await supabase
       .from('projects')
       .update(project)
@@ -331,13 +333,14 @@ class ContentManager {
       console.error('Error updating project:', error);
     }
     const index = this.projects.findIndex(p => p.id === id);
-    if (index === -1) return null;
+    if (index != -1) {
+      this.projects[index] = { ...this.projects[index], ...project };
+    }
 
-    this.projects[index] = { ...this.projects[index], ...project };
-    return this.projects[index];
+    return this.projects.sort((a, b) => a.range - b.range);
   }
 
-  async deleteProject(id: string): Promise<boolean> {
+  async deleteProject(id: string): Promise<Project[]> {
     const { data, error } = await supabase
       .from('projects')
       .delete()
@@ -349,10 +352,11 @@ class ContentManager {
       console.log('project deleted:', data);
     }
     const index = this.projects.findIndex(p => p.id === id);
-    if (index === -1) return false;
+    if (index != -1) {
+        this.projects.splice(index, 1);
+    }
 
-    this.projects.splice(index, 1);
-    return true;
+    return this.projects.sort((a, b) => a.range - b.range);
   }
 
   // Clients
@@ -394,10 +398,10 @@ class ContentManager {
     if (index != -1) {
       this.clients[index] = { ...this.clients[index], ...client };
     }
-    return this.clients.sort((a, b) => a.range - b.range);;
+    return this.clients.sort((a, b) => a.range - b.range);
   }
 
-  async deleteClient(id: string): Promise<boolean> {
+  async deleteClient(id: string): Promise<Client[]> {
     const { error } = await supabase
       .from('clients')
       .delete()
@@ -407,10 +411,11 @@ class ContentManager {
       console.error('Error deleting client:', error);
     }
     const index = this.clients.findIndex(c => c.id === id);
-    if (index === -1) return false;
+    if (index != -1) {
+        this.clients.splice(index, 1);
+    }
 
-    this.clients.splice(index, 1);
-    return true;
+    return this.clients.sort((a, b) => a.range - b.range);
   }
 
   async getProjectStatus(): Promise<ProjectStatus[]> {
