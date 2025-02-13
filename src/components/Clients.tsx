@@ -26,28 +26,37 @@ export default function Clients() {
     };
   }, []);
 
-  // Dragging logic
-  const handleMouseDown = (e: React.MouseEvent) => {
+  // Dragging logic for PC (mouse)
+  const handleMouseDown = (e: React.MouseEvent) => startDrag(e.pageX);
+  const handleMouseMove = (e: React.MouseEvent) => dragMove(e.pageX);
+  const handleMouseUp = () => endDrag();
+
+  // Dragging logic for Mobile (touch)
+  const handleTouchStart = (e: React.TouchEvent) => startDrag(e.touches[0].pageX);
+  const handleTouchMove = (e: React.TouchEvent) => dragMove(e.touches[0].pageX);
+  const handleTouchEnd = () => endDrag();
+
+  const startDrag = (position: number) => {
     const slider = sliderRef.current;
     if (!slider) return;
 
     setIsDragging(true);
-    setStartX(e.pageX - slider.offsetLeft);
+    setStartX(position - slider.offsetLeft);
     setScrollLeft(slider.scrollLeft);
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const dragMove = (position: number) => {
     if (!isDragging) return;
 
     const slider = sliderRef.current;
     if (!slider) return;
 
-    const x = e.pageX - slider.offsetLeft;
+    const x = position - slider.offsetLeft;
     const walk = (x - startX) * 1.5; // Speed factor
     slider.scrollLeft = scrollLeft - walk;
   };
 
-  const handleMouseUp = () => {
+  const endDrag = () => {
     setIsDragging(false);
   };
 
@@ -63,7 +72,7 @@ export default function Clients() {
           </p>
         </div>
 
-        {/* Auto-scrolling & draggable slider */}
+        {/* Auto-scrolling & draggable slider (Now works on mobile & PC) */}
         <div
           className="mt-12 relative w-full overflow-hidden cursor-grab active:cursor-grabbing"
           ref={sliderRef}
@@ -71,6 +80,9 @@ export default function Clients() {
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
           <div
             className={`flex space-x-6 w-max scrolling-container ${
@@ -119,6 +131,14 @@ export default function Clients() {
             }
             .paused {
               animation-play-state: paused;
+            }
+            /* Hide scrollbar */
+            .scrolling-container::-webkit-scrollbar {
+              display: none;
+            }
+            .scrolling-container {
+              -ms-overflow-style: none;
+              scrollbar-width: none;
             }
           `}
         </style>
