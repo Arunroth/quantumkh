@@ -13,7 +13,7 @@ export default function Hero() {
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-dark-900 dark:text-white leading-tight">
               {hero.title}
-              <span className="block text-primary-500">{hero.subtitle}</span>
+              <span className="block text-primary-500">{hero.subtitle}.</span>
             </h1>
             <p className="mt-6 text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
               {hero.description}
