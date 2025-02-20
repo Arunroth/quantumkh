@@ -92,7 +92,7 @@ export default function Clients() {
             {clients.concat(clients).map((client, index) => (
               <div
                 key={client.id + "-" + index}
-                className="flex-none w-56 bg-white mb-4  dark:bg-dark-900 rounded-lg p-4 shadow-md"
+                className="flex-none w-56 bg-white mb-4  select-none dark:bg-dark-900 rounded-lg p-4 shadow-md"
               >
                 <div className="flex items-center justify-center h-20 mb-3">
                   <img

@@ -50,9 +50,9 @@ export default function Navbar() {
               </div>
             </Link>
             <ThemeToggle />
-            <button className="btn-primary">
+            <Link to="/request-project"  className="btn-primary">
               Get Started
-            </button>
+            </Link>
           </div>
 
           <div className="md:hidden flex items-center space-x-4">
@@ -91,9 +91,9 @@ export default function Navbar() {
             >
               Track Project
             </Link>
-            <button className="w-full mt-2 btn-primary">
-              Get Started (Demo)
-            </button>
+            <Link to="/request-project" className="w-full mt-2 btn-primary">
+              Get Started
+            </Link>
           </div>
         </div>
       )}
