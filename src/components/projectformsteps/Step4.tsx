@@ -8,10 +8,10 @@ export default function Step4({ onBack }: { onBack: () => void }) {
 
             {/* Buttons */}
             <div className="flex justify-between mt-4">
-                <button onClick={onBack} className="bg-gray-500 text-white px-4 py-2 rounded-md">
-                    Back
+                <button onClick={onBack} className="text-gray-500 font-semibold px-4 py-2 rounded-md">
+                    Go Back
                 </button>
-                <button className="bg-green-700 text-white px-4 py-2 rounded-md">Submit</button>
+                <button className="bg-[#eab308]  text-white px-12 py-2 rounded-3xl">Submit Form</button>
             </div>
         </div>
     );

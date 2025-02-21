@@ -1,6 +1,19 @@
-import {useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {z} from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { InputCustom, SelectOption } from "../common/SelectOption";
+
+enum ContactMethods {
+    Email = "Email",
+    Phone = "Phone",
+    Telegram = "Telegram",
+    Other = "Other",
+}
+
+const contactMethods = Object.entries(ContactMethods).map(([key, value]) => ({
+    value: key, // Use key as value
+    label: value, // Use value as label
+}));
 
 const schema = z.object({
     name: z.string().min(2, "This field is required"),
@@ -10,12 +23,12 @@ const schema = z.object({
     contact_method: z.string().min(1, "This field is required"),
 });
 
-export default function Step1({onNext}: { onNext: () => void }) {
+export default function Step1({ onNext }: { onNext: () => void }) {
     const {
         register,
         handleSubmit,
-        formState: {errors},
-    } = useForm({resolver: zodResolver(schema)});
+        formState: { errors },
+    } = useForm({ resolver: zodResolver(schema) });
 
     return (
         <form onSubmit={handleSubmit(onNext)} className="flex flex-col h-full">
@@ -23,62 +36,15 @@ export default function Step1({onNext}: { onNext: () => void }) {
                 <h2 className="text-2xl font-bold">Contact Info</h2>
                 <p className="text-gray-500">Please provide your name, email address, and phone number.</p>
 
-                <div>
-                    <div className="flex justify-between">
-                        <label className="block text-sm font-medium">Name</label>
-                        {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
-                    </div>
-                    <input {...register("name")}
-                           type={"text"}
-                           className="w-full p-2 border rounded-md focus:outline-yellow-300 focus:shadow-outline"
-                           placeholder="e.g. Stephen King"/>
-                </div>
+                <InputCustom label="Full Name" errors={errors} name="name" register={register} placeholder="Your full name"></InputCustom>
 
-                <div>
-                    <div className="flex justify-between">
-                        <label className="block text-sm font-medium">Company Name</label>
-                        {errors.company_name && <p className="text-red-500 text-sm">{errors.company_name.message}</p>}
-                    </div>
-                    <input {...register("company_name")}
-                           className="w-full p-2 border rounded-md focus:outline-yellow-300 focus:shadow-outline"
-                           placeholder="Company Name"/>
-                </div>
+                <InputCustom label="Company Name" errors={errors} name="company_name" register={register} placeholder="Your full name"></InputCustom>
 
-                <div>
-                    <div className="flex justify-between">
-                        <label className="block text-sm font-medium">Email Address</label>
-                        {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
-                    </div>
-                    <input {...register("email")}
-                           className="w-full p-2 border rounded-md focus:outline-yellow-300 focus:shadow-outline"
-                           placeholder="e.g. stephen@lorem.com"/>
-                </div>
+                <InputCustom label="Email Address" errors={errors} name="email" register={register} placeholder="Your full name"></InputCustom>
 
-                <div>
-                    <div className="flex justify-between">
-                        <label className="block text-sm font-medium">Phone Number</label>
-                        {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
-                    </div>
-                    <input {...register("phone")} type={"number"}
-                           className="w-full p-2 border rounded-md focus:outline-yellow-300 focus:shadow-outline"
-                           placeholder="e.g. +855 12345678"/>
-                </div>
+                <InputCustom label="Phone Number" errors={errors} name="phone" register={register} placeholder="Your full name"></InputCustom>
 
-                <div>
-                    <div className="flex justify-between">
-                        <label className="block text-sm font-medium">Preferred Contact Method</label>
-                        {errors.contact_method &&
-                            <p className="text-red-500 text-sm">{errors.contact_method.message}</p>}
-                    </div>
-                    <select id="countries" {...register("contact_method")}
-                            className="block w-full p-2 border rounded-md focus:outline-yellow-300 focus:shadow-outline">
-                        <option selected disabled={true}>Choose a country</option>
-                        <option value="US">United States</option>
-                        <option value="CA">Canada</option>
-                        <option value="FR">France</option>
-                        <option value="DE">Germany</option>
-                    </select>
-                </div>
+                <SelectOption label="Preferred Contact Method" errors={errors} name="contact_method" choosenTitle="Choose a Contact Method" options={contactMethods} register={register}></SelectOption>
             </div>
 
             <div className="flex justify-end mt-6">
