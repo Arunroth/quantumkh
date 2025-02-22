@@ -112,7 +112,7 @@ export default function ServicesPage() {
             <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
               Contact us today to discuss your manufacturing needs and get a custom quote
             </p>
-            <Link  to="/not-implemented" className="bg-white text-primary-600 hover:bg-gray-100 px-8 py-3 rounded-md font-semibold transition-colors">
+            <Link  to="/request-project" className="bg-white text-primary-600 hover:bg-gray-100 px-8 py-3 rounded-md font-semibold transition-colors">
               Get Started
             </Link>
           </div>

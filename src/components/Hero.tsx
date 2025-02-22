@@ -19,7 +19,7 @@ export default function Hero() {
               {hero.description}
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
-              <Link to="/not-implemented" className="btn-primary">
+              <Link to="/request-project" className="btn-primary">
                 Start Your Project
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
