@@ -57,4 +57,4 @@ export function isContainInEnum<T>(o: { [s: string]: T; }, str?: string) {
     return enumValues.includes(str.toLowerCase());
 }
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://quantumkh_api.fifty-point.com';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://quantumkh-api.fifty-point.com';
