@@ -15,7 +15,7 @@ const ProjectListTable: React.FC<ProjectListTableProps> = ({projects}) => {
             </div>
             <div className="relative overflow-x-auto">
                 <table
-                    className="w-full min-h-[180px] text-md  text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                    className="w-full min-h-[180px] text-sm  text-left rtl:text-right text-gray-500 dark:text-gray-400">
                     <thead
                         className="  py-4 text-gray-700 uppercase bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
                     <tr>
