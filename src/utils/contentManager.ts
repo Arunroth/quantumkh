@@ -6,13 +6,20 @@ import trackingProjectsData from '../data/tracking.json';
 import heroData from '../data/hero.json';
 import featuresData from '../data/features.json';
 import {supabase} from './supabase';
+import {API_BASE_URL} from "./serviceManageer.ts";
 
 export interface FileName {
     originalFilename: string;
     filename: string;
 }
 
-export type RequestProjectFormData = {
+export interface ResponseProject extends RequestProjectFormData {
+    id: string;
+    createdAt: string;
+    projectStatus: string
+}
+
+export interface RequestProjectFormData {
     // Step 1
     name: string;
     companyName?: string; // Optional field
@@ -135,6 +142,11 @@ class ContentManager {
     private projects: Project[] = projectsData.projects;
     private clients: Client[] = clientsData.clients;
     private projectStatus: ProjectStatus[] = trackingProjectsData.projects;
+    private readonly API_BASE_URL: string;
+
+    constructor() {
+        this.API_BASE_URL = API_BASE_URL
+    }
 
     // Hero
     async getHero(): Promise<Hero> {
@@ -555,7 +567,7 @@ class ContentManager {
 
         const updatedStages: ProjectStage[] = [];
         if (stages) {
-            stages.forEach(async (stage) => {
+            for (const stage of stages) {
                 if (stage.id == "" || stage.id == undefined) {
                     const {data, error} = await supabase.from('project_stages').insert(stage).select();
                     if (error) {
@@ -572,7 +584,7 @@ class ContentManager {
                     }
                     updatedStages.push(updatedStage![0] as ProjectStage);
                 }
-            });
+            }
         }
 
         updatedStatus.stages = updatedStages;
@@ -604,6 +616,49 @@ class ContentManager {
         this.projectStatus.splice(index, 1);
         return true;
     }
+
+    async getRequestProjects(): Promise<ResponseProject[]> {
+        try {
+            const response = await fetch(`${this.API_BASE_URL}/request-projects`, {
+                method: "GET", // Explicitly specify method (optional, GET is default)
+                headers: {
+                    "Content-Type": "application/json",
+                    // Add any additional headers (e.g., authorization) if needed
+                },
+            });
+
+            if (!response.ok) {
+                console.error(`Failed to fetch request projects: ${response.status} ${response.statusText}`);
+
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("Error fetching request projects:", error);
+            return []
+        }
+    }
+
+    async getRequestProjectById(id: string): Promise<ResponseProject | null> {
+        try {
+            const response = await fetch(`${this.API_BASE_URL}/request-projects/${id}`, {
+                method: "GET", // Explicitly specify method (optional, GET is default)
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                console.error(`Failed to fetch request projects: ${response.status} ${response.statusText}`);
+
+            }
+            return await response.json();
+        } catch (error) {
+            console.error("Error fetching request projects:", error);
+            return null
+        }
+    }
+
 }
 
 export const contentManager = new ContentManager();

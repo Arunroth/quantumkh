@@ -43,7 +43,7 @@ export enum ContactMethods {
 
 export function getOptions<T>(o: { [s: string]: T; }) {
     return Object.entries(o).map(([key, value]) => ({
-        value: key.toLowerCase(), // Use key as value
+        value: key, // Use key as value
         label: value, // Use value as label
     }));
 }
@@ -56,3 +56,5 @@ export function isContainInEnum<T>(o: { [s: string]: T; }, str?: string) {
     console.log(enumValues, str.toLowerCase())
     return enumValues.includes(str.toLowerCase());
 }
+
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://quantumkh_api.fifty-point.com';

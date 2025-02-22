@@ -5,10 +5,14 @@ import {InputCustom, SelectOptionCustom} from "../common/SelectOption";
 import {FileName, RequestProjectFormData} from "../../utils/contentManager.ts";
 import axios from "axios";
 import {useState} from "react";
-import {FinishSurfaces, getOptions, MaterialPreferences, ToleranceRequirements} from "../../utils/serviceManageer.ts";
+import {
+    API_BASE_URL,
+    FinishSurfaces,
+    getOptions,
+    MaterialPreferences,
+    ToleranceRequirements
+} from "../../utils/serviceManageer.ts";
 import SelectOptionReactSelect from "../common/SelectMultiOption.tsx";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const schema = z.object({
     materialPreferences: z.array(z.string()).min(1, "Please choose some material(s)"),

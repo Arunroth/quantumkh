@@ -6,11 +6,9 @@ import Step3B from "./projectformsteps/Step3B.tsx";
 import Step4 from "./projectformsteps/Step4.tsx";
 import {RequestProjectFormData} from "../utils/contentManager.ts";
 import SuccessMessage from "./projectformsteps/Step5.tsx";
-import {isContainInEnum, ServiceTypes} from "../utils/serviceManageer.ts";
+import {API_BASE_URL, isContainInEnum, ServiceTypes} from "../utils/serviceManageer.ts";
 
 const steps = ["Contact Info", "Project Type", "Technical Specifications", "Additional Requests", "Successfully request!"];
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function MultiStepForm() {
     const [step, setStep] = useState(1);
@@ -37,8 +35,10 @@ export default function MultiStepForm() {
         }
     }
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (data: Partial<RequestProjectFormData>) => {
         try {
+            setFormData((prev) => ({...prev, ...data}));
+            console.log(formData, data)
             const response = await fetch(`${API_BASE_URL}/request-projects`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},

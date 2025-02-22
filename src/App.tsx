@@ -19,6 +19,8 @@ import {AuthProvider, RequireAuth} from './context/AuthContext';
 import NotImplemented from './components/NotImplemented';
 import PageNotFound from './components/PageNotFound';
 import MultiStepForm from "./components/MultiStepForm.tsx";
+import ProjectManager from "./components/admin/ProjectManager.tsx";
+import ProjectDetail from "./components/admin/ProjectDetailsManager.tsx";
 
 function HomePage() {
     return (
@@ -123,6 +125,8 @@ export default function App() {
                                 >
                                     <Route index element={<Dashboard/>}/>
                                     <Route path="content" element={<ContentManager/>}/>
+                                    <Route path="projects" element={<ProjectManager/>}/>
+                                    <Route path="projects/:id" element={<ProjectDetail/>}/>
                                     <Route path="services" element={<ServicesManager/>}/>
                                 </Route>
                                 {/* Not Implemented Example */}

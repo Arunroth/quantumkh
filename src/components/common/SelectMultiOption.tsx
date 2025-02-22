@@ -24,16 +24,16 @@ const SelectOptionReactSelect: React.FC<SelectMultiCustomProps> = ({
     useEffect(() => {
         if (value) {
             const valuesArray = Array.isArray(value) ? value : [value];
-            const staticOptions = options.map((o) => o.value.toLowerCase());
+            const staticOptions = options.map((o) => o.value);
 
             const selectedStaticOptions = options.filter((opt) =>
-                valuesArray.some((v) => v.toLowerCase() === opt.value.toLowerCase())
+                valuesArray.some((v) => v === opt.value)
             );
-            const customValue = valuesArray.find((v) => !staticOptions.includes(v.toLowerCase()));
+            const customValue = valuesArray.find((v) => !staticOptions.includes(v));
 
             setSelectedOptions(
                 customValue
-                    ? [...selectedStaticOptions, {value: "other", label: "Other"}]
+                    ? [...selectedStaticOptions, {value: "Other", label: "Other"}]
                     : selectedStaticOptions
             );
             setOtherValue(customValue || '');
@@ -50,13 +50,13 @@ const SelectOptionReactSelect: React.FC<SelectMultiCustomProps> = ({
 
         if (register) {
             const values = newValue.map((opt) => opt.value);
-            const finalValues = values.includes('other') && otherValue
-                ? [...values.filter((v) => v !== 'other'), otherValue]
+            const finalValues = values.includes('Other') && otherValue
+                ? [...values.filter((v) => v !== 'Other'), otherValue]
                 : values;
             register(name).onChange({target: {value: finalValues, name}});
         }
 
-        if (!newValue.some((opt) => opt.value === 'other')) {
+        if (!newValue.some((opt) => opt.value === 'Other')) {
             setOtherValue('');
         }
     };
@@ -65,9 +65,9 @@ const SelectOptionReactSelect: React.FC<SelectMultiCustomProps> = ({
         const newOtherValue = e.target.value;
         setOtherValue(newOtherValue);
 
-        if (register && selectedOptions.some((opt) => opt.value === 'other')) {
+        if (register && selectedOptions.some((opt) => opt.value === 'Other')) {
             const staticValues = selectedOptions
-                .filter((opt) => opt.value !== 'other')
+                .filter((opt) => opt.value !== 'Other')
                 .map((opt) => opt.value);
             const finalValues = [...staticValues, newOtherValue];
             register(name).onChange({target: {value: finalValues, name}});
@@ -125,7 +125,7 @@ const SelectOptionReactSelect: React.FC<SelectMultiCustomProps> = ({
                 }}
             />
 
-            {selectedOptions.some((opt) => opt.value === 'other') && (
+            {selectedOptions.some((opt) => opt.value === 'Other') && (
                 <div className="mt-2">
                     <input
                         type="text"

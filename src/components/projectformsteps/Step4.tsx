@@ -12,7 +12,7 @@ const schema = z.object({
 type StepData = z.infer<typeof schema>;
 
 export default function Step4({onBack, onSubmit, formData}: {
-    onBack: () => void; onSubmit: () => void; formData: Partial<RequestProjectFormData>;
+    onBack: () => void; onSubmit: (data: StepData) => void; formData: Partial<RequestProjectFormData>;
 }) {
     const {
         register,
@@ -23,8 +23,8 @@ export default function Step4({onBack, onSubmit, formData}: {
         defaultValues: formData, // Pre-populate with existing data
     });
 
-    const onFinalSubmit = () => {
-        onSubmit();
+    const onFinalSubmit = (data: StepData) => {
+        onSubmit(data);
     };
 
     return (

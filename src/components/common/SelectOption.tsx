@@ -36,13 +36,13 @@ const SelectOptionCustom: React.FC<SelectCustomProps> = ({
     // Sync local state with form value when it changes (e.g., on navigation)
     useEffect(() => {
         if (value) {
-            const lowercaseValue = value.toLowerCase();
+            const lowercaseValue = value;
             const isStaticOption = options.some((option) => option.value === lowercaseValue);
             if (isStaticOption) {
                 setSelectedValue(lowercaseValue);
                 setOtherValue('');
             } else {
-                setSelectedValue('other'); // Use lowercase 'other' to match option value
+                setSelectedValue('Other'); // Use lowercase 'other' to match option value
                 setOtherValue(value); // Show custom value in input
             }
         } else {
@@ -53,7 +53,7 @@ const SelectOptionCustom: React.FC<SelectCustomProps> = ({
 
     // Update form value when "Other" input changes
     useEffect(() => {
-        if (selectedValue === 'other' && otherValue && register) {
+        if (selectedValue === 'Other' && otherValue && register) {
             const event = {
                 target: {value: otherValue, name},
             } as React.ChangeEvent<HTMLSelectElement>;
@@ -64,10 +64,10 @@ const SelectOptionCustom: React.FC<SelectCustomProps> = ({
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const newValue = e.target.value;
         setSelectedValue(newValue);
-        if (newValue !== 'other' && register) {
+        if (newValue !== 'Other' && register) {
             register(name).onChange(e); // Update form for static options
         }
-        if (newValue !== 'other') {
+        if (newValue !== 'Other') {
             setOtherValue(''); // Clear "Other" input when switching away
         }
     };
@@ -121,7 +121,7 @@ const SelectOptionCustom: React.FC<SelectCustomProps> = ({
                 </svg>
             </div>
 
-            {selectedValue === 'other' && (
+            {selectedValue === 'Other' && (
                 <div className="mt-2">
                     <input
                         type="text"
