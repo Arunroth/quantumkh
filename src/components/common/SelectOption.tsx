@@ -7,17 +7,17 @@ interface SelectOption {
 
 interface SelectProps extends InputProps {
     options: SelectOption[];
-    register?: any; // For use with react-hook-form
+    register?: any;
     chosenTitle?: string;
     otherOption?: string;
 }
 
 interface SelectCustomProps extends SelectProps {
-    value?: string
+    value?: string;
 }
 
 export interface SelectMultiCustomProps extends SelectProps {
-    value?: string[]
+    value?: string[];
 }
 
 const SelectOptionCustom: React.FC<SelectCustomProps> = ({
@@ -33,7 +33,6 @@ const SelectOptionCustom: React.FC<SelectCustomProps> = ({
     const [selectedValue, setSelectedValue] = useState<string>('');
     const [otherValue, setOtherValue] = useState<string>('');
 
-    // Sync local state with form value when it changes (e.g., on navigation)
     useEffect(() => {
         if (value) {
             const lowercaseValue = value;
@@ -42,8 +41,8 @@ const SelectOptionCustom: React.FC<SelectCustomProps> = ({
                 setSelectedValue(lowercaseValue);
                 setOtherValue('');
             } else {
-                setSelectedValue('Other'); // Use lowercase 'other' to match option value
-                setOtherValue(value); // Show custom value in input
+                setSelectedValue('Other');
+                setOtherValue(value);
             }
         } else {
             setSelectedValue('');
@@ -51,7 +50,6 @@ const SelectOptionCustom: React.FC<SelectCustomProps> = ({
         }
     }, [value, options]);
 
-    // Update form value when "Other" input changes
     useEffect(() => {
         if (selectedValue === 'Other' && otherValue && register) {
             const event = {
@@ -65,10 +63,10 @@ const SelectOptionCustom: React.FC<SelectCustomProps> = ({
         const newValue = e.target.value;
         setSelectedValue(newValue);
         if (newValue !== 'Other' && register) {
-            register(name).onChange(e); // Update form for static options
+            register(name).onChange(e);
         }
         if (newValue !== 'Other') {
-            setOtherValue(''); // Clear "Other" input when switching away
+            setOtherValue('');
         }
     };
 
@@ -78,7 +76,7 @@ const SelectOptionCustom: React.FC<SelectCustomProps> = ({
 
     return (
         <div>
-            <div className="mb-1 text-gray-500 flex justify-between">
+            <div className="mb-1 text-gray-500 dark:text-gray-300 flex justify-between">
                 <label className="block text-sm font-medium">
                     {label}{' '}
                     <span className="text-red-500 font-bold">{isRequired ? '*' : ''}</span>
@@ -90,15 +88,14 @@ const SelectOptionCustom: React.FC<SelectCustomProps> = ({
                 <select
                     {...(register ? register(name) : {})}
                     onChange={handleSelectChange}
-                    value={selectedValue} // Controlled by local state
-                    className="w-full rounded-md focus:outline-yellow-300 focus:shadow-outline bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border pl-3 pr-8 py-2 transition duration-300 ease focus:shadow-md appearance-none cursor-pointer"
+                    value={selectedValue}
+                    className="w-full rounded-md focus:outline-yellow-300 focus:shadow-outline bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 placeholder:text-slate-400 text-gray-900 dark:text-gray-100 text-sm pl-3 pr-8 py-2 transition duration-300 ease focus:shadow-md appearance-none cursor-pointer"
                 >
                     {chosenTitle ? (
                         <option value="" disabled>
                             {chosenTitle}
                         </option>
                     ) : null}
-
                     {options.map((option) => (
                         <option key={option.value} value={option.value}>
                             {option.label}
@@ -111,7 +108,7 @@ const SelectOptionCustom: React.FC<SelectCustomProps> = ({
                     viewBox="0 0 24 24"
                     strokeWidth={1.2}
                     stroke="currentColor"
-                    className="h-5 w-5 ml-1 absolute top-2.5 right-2.5 text-slate-700"
+                    className="h-5 w-5 ml-1 absolute top-2.5 right-2.5 text-gray-700 dark:text-gray-300"
                 >
                     <path
                         strokeLinecap="round"
@@ -128,14 +125,13 @@ const SelectOptionCustom: React.FC<SelectCustomProps> = ({
                         value={otherValue}
                         onChange={handleOtherInputChange}
                         placeholder="Please specify"
-                        className="w-full rounded-md focus:outline-yellow-300 focus:shadow-outline bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border pl-3 pr-3 py-2 transition duration-300 ease focus:shadow-md"
+                        className="w-full rounded-md focus:outline-yellow-300 focus:shadow-outline bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-gray-100 text-sm pl-3 pr-3 py-2 transition duration-300 ease focus:shadow-md"
                     />
                 </div>
             )}
         </div>
     );
 };
-
 
 const SelectOption: React.FC<SelectProps> = ({
                                                  name,
@@ -144,12 +140,11 @@ const SelectOption: React.FC<SelectProps> = ({
                                                  register,
                                                  errors,
                                                  chosenTitle,
-                                                 isRequired
+                                                 isRequired,
                                              }) => {
-
     return (
         <div>
-            <div className="mb-1 text-gray-500 flex justify-between">
+            <div className="mb-1 text-gray-500 dark:text-gray-300 flex justify-between">
                 <label className="block text-sm font-medium">
                     {label}{' '}
                     <span className="text-red-500 font-bold">{isRequired ? '*' : ''}</span>
@@ -160,14 +155,13 @@ const SelectOption: React.FC<SelectProps> = ({
             <div className="relative">
                 <select
                     {...(register ? register(name) : {})}
-                    className="w-full rounded-md focus:outline-yellow-300 focus:shadow-outline bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border pl-3 pr-8 py-2 transition duration-300 ease focus:shadow-md appearance-none cursor-pointer"
+                    className="w-full rounded-md focus:outline-yellow-300 focus:shadow-outline bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 placeholder:text-slate-400 text-gray-900 dark:text-gray-100 text-sm pl-3 pr-8 py-2 transition duration-300 ease focus:shadow-md appearance-none cursor-pointer"
                 >
                     {chosenTitle ? (
                         <option value="" selected disabled>
                             {chosenTitle}
                         </option>
                     ) : null}
-
                     {options.map((option) => (
                         <option key={option.value} value={option.value}>
                             {option.label}
@@ -180,7 +174,7 @@ const SelectOption: React.FC<SelectProps> = ({
                     viewBox="0 0 24 24"
                     strokeWidth={1.2}
                     stroke="currentColor"
-                    className="h-5 w-5 ml-1 absolute top-2.5 right-2.5 text-slate-700"
+                    className="h-5 w-5 ml-1 absolute top-2.5 right-2.5 text-gray-700 dark:text-gray-300"
                 >
                     <path
                         strokeLinecap="round"
@@ -193,7 +187,6 @@ const SelectOption: React.FC<SelectProps> = ({
     );
 };
 
-
 interface InputProps {
     name: string;
     label: string;
@@ -201,7 +194,7 @@ interface InputProps {
     register?: any;
     errors?: any;
     placeholder?: string;
-    isRequired?: boolean
+    isRequired?: boolean;
 }
 
 const InputCustom: React.FC<InputProps> = ({
@@ -211,18 +204,20 @@ const InputCustom: React.FC<InputProps> = ({
                                                register,
                                                errors,
                                                placeholder,
-                                               isRequired
+                                               isRequired,
                                            }) => {
     return (
         <div>
-            <div className="mb-1 text-gray-500 flex justify-between">
-                <label className="block text-sm font-medium">{label} <span
-                    className="text-red-500 font-bold">{isRequired ? '*' : ''}</span></label>
+            <div className="mb-1 text-gray-500 dark:text-gray-300 flex justify-between">
+                <label className="block text-sm font-medium">
+                    {label}{' '}
+                    <span className="text-red-500 font-bold">{isRequired ? '*' : ''}</span>
+                </label>
                 {errors?.[name] && <p className="text-red-500 text-sm">{errors[name].message}</p>}
             </div>
             <input
                 {...(register ? register(name) : {})}
-                className="w-full rounded-md focus:outline-yellow-300 focus:shadow-outline bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border pl-3 pr-8 py-2 transition duration-300 ease focus:shadow-md appearance-none cursor-pointer"
+                className="w-full rounded-md focus:outline-yellow-300 focus:shadow-outline bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 placeholder:text-gray-400 dark:focus:border-0  dark:placeholder:text-gray-500 text-gray-900 dark:text-gray-100 text-sm pl-3 pr-3 py-2 transition duration-300 ease focus:shadow-md autofill:bg-white dark:autofill:bg-gray-700"
                 type={type}
                 placeholder={placeholder}
             />
@@ -231,7 +226,7 @@ const InputCustom: React.FC<InputProps> = ({
 };
 
 interface TextAreaProps extends InputProps {
-    row: number
+    row: number;
 }
 
 const TextAreaCustom: React.FC<TextAreaProps> = ({
@@ -241,18 +236,23 @@ const TextAreaCustom: React.FC<TextAreaProps> = ({
                                                      register,
                                                      errors,
                                                      placeholder,
-                                                     isRequired
+                                                     isRequired,
                                                  }) => {
     return (
         <div>
-            <div className="mb-1 text-gray-500 flex justify-between">
-                <label className="block text-sm font-medium">{label} <span
-                    className="text-red-500 font-bold">{isRequired ? '*' : ''}</span></label>
+            <div className="mb-1 text-gray-500 dark:text-gray-300 flex justify-between">
+                <label className="block text-sm font-medium">
+                    {label}{' '}
+                    <span className="text-red-500 font-bold">{isRequired ? '*' : ''}</span>
+                </label>
                 {errors?.[name] && <p className="text-red-500 text-sm">{errors[name].message}</p>}
             </div>
-            <textarea rows={row} {...(register ? register(name) : {})}
-                      className="block p-2.5 w-full text-sm text-gray-900 border rounded-md focus:outline-yellow-300 focus:shadow-outline dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      placeholder={placeholder}></textarea>
+            <textarea
+                rows={row}
+                {...(register ? register(name) : {})}
+                className="block p-2.5 w-full text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-yellow-300 focus:shadow-outline placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-gray-100 transition duration-300 ease focus:shadow-md"
+                placeholder={placeholder}
+            />
         </div>
     );
 };

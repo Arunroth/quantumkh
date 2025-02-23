@@ -23,8 +23,8 @@ const SuccessMessage: React.FC<SuccessMessageProps> = ({onReset}) => {
                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                 </svg>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">Congratulations!</h2>
-                <p className="text-gray-600 mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">Congratulations!</h2>
+                <p className="text-gray-600 dark:text-gray-300 mb-6">
                     Your project request has been submitted successfully. We’ll get back to you soon!
                 </p>
                 <button

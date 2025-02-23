@@ -76,7 +76,7 @@ const SelectOptionReactSelect: React.FC<SelectMultiCustomProps> = ({
 
     return (
         <div>
-            <div className="mb-1 text-gray-500 flex justify-between">
+            <div className="mb-1 text-gray-500 dark:text-gray-300 flex justify-between">
                 <label className="block text-sm font-medium">
                     {label} <span className="text-red-500 font-bold">{isRequired ? '*' : ''}</span>
                 </label>
@@ -90,37 +90,98 @@ const SelectOptionReactSelect: React.FC<SelectMultiCustomProps> = ({
                 value={selectedOptions}
                 onChange={handleSelectChange}
                 placeholder={placeholder}
-                className="basic-multi-select "
-                classNamePrefix="select"
+                className="basic-multi-select  "
+                classNamePrefix="select my-selection"
                 styles={{
-                    control: (base) => ({
+                    control: (base, state) => ({
                         ...base,
                         borderRadius: '0.375rem',
-                        borderColor: '#e2e8f0',
+                        borderColor: state.isFocused
+                            ? '#facc15'
+                            : document.documentElement.classList.contains('dark')
+                                ? '#4b5563' // gray-600
+                                : '#e2e8f0', // slate-200
+                        backgroundColor: document.documentElement.classList.contains('dark')
+                            ? '#374151' // gray-700
+                            : 'white',
                         padding: '0.1rem',
-                        '&:hover': {borderColor: '#d1d5db'},
-                        boxShadow: 'none',
-                        '&:focus': {
-                            outline: '2px solid #facc15',
-                            outlineOffset: '2px',
+                        '&:hover': {
+                            borderColor: document.documentElement.classList.contains('dark')
+                                ? '#6b7280' // gray-500
+                                : '#d1d5db', // gray-300
+                        },
+                        boxShadow: state.isFocused ? '0 0 0 2px #facc15' : 'none',
+                        color: document.documentElement.classList.contains('dark')
+                            ? '#d1d5db' // gray-300
+                            : '#1f2937', // gray-800
+                    }),
+                    menu: (base) => ({
+                        ...base,
+                        backgroundColor: document.documentElement.classList.contains('dark')
+                            ? '#374151' // gray-700
+                            : 'white',
+                        color: document.documentElement.classList.contains('dark')
+                            ? '#d1d5db' // gray-300
+                            : '#1f2937', // gray-800
+                    }),
+                    option: (base, state) => ({
+                        ...base,
+                        backgroundColor: state.isSelected
+                            ? document.documentElement.classList.contains('dark')
+                                ? '#4b5563' // gray-600
+                                : '#e5e7eb' // gray-200
+                            : state.isFocused
+                                ? document.documentElement.classList.contains('dark')
+                                    ? '#4b5563' // gray-600
+                                    : '#f3f4f6' // gray-100
+                                : 'transparent',
+                        color: document.documentElement.classList.contains('dark')
+                            ? '#d1d5db' // gray-300
+                            : '#1f2937', // gray-800
+                        '&:hover': {
+                            backgroundColor: document.documentElement.classList.contains('dark')
+                                ? '#4b5563' // gray-600
+                                : '#f3f4f6', // gray-100
                         },
                     }),
                     multiValue: (base) => ({
                         ...base,
-                        backgroundColor: '#e5e7eb',
+                        backgroundColor: document.documentElement.classList.contains('dark')
+                            ? '#4b5563' // gray-600
+                            : '#e5e7eb', // gray-200
                         borderRadius: '0.25rem',
                     }),
                     multiValueLabel: (base) => ({
                         ...base,
-                        color: '#1f2937',
+                        color: document.documentElement.classList.contains('dark')
+                            ? '#d1d5db' // gray-300
+                            : '#1f2937', // gray-800
                     }),
                     multiValueRemove: (base) => ({
                         ...base,
-                        color: '#6b7280',
+                        color: document.documentElement.classList.contains('dark')
+                            ? '#9ca3af' // gray-400
+                            : '#6b7280', // gray-500
                         '&:hover': {
-                            backgroundColor: '#d1d5db',
-                            color: '#374151',
+                            backgroundColor: document.documentElement.classList.contains('dark')
+                                ? '#6b7280' // gray-500
+                                : '#d1d5db', // gray-300
+                            color: document.documentElement.classList.contains('dark')
+                                ? '#d1d5db' // gray-300
+                                : '#374151', // gray-700
                         },
+                    }),
+                    placeholder: (base) => ({
+                        ...base,
+                        color: document.documentElement.classList.contains('dark')
+                            ? '#6b7280' // gray-500
+                            : '#9ca3af', // gray-400
+                    }),
+                    input: (base) => ({
+                        ...base,
+                        color: document.documentElement.classList.contains('dark')
+                            ? '#d1d5db' // gray-300
+                            : '#1f2937', // gray-800
                     }),
                 }}
             />
@@ -132,7 +193,7 @@ const SelectOptionReactSelect: React.FC<SelectMultiCustomProps> = ({
                         value={otherValue}
                         onChange={handleOtherInputChange}
                         placeholder="Please specify"
-                        className="w-full rounded-md focus:outline-yellow-300 focus:shadow-outline bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border pl-3 pr-3 py-2 transition duration-300 ease focus:shadow-md"
+                        className="block p-2.5 w-full text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-yellow-300 focus:shadow-outline placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-gray-100 transition duration-300 ease focus:shadow-md"
                     />
                 </div>
             )}

@@ -128,7 +128,7 @@ export default function Step3A({onNext, onBack, formData}: {
             <div className="flex-1 space-y-4">
 
                 <h2 className="text-2xl font-bold">Technical Specifications</h2>
-                <p className="text-gray-500">Select any additional features you need.</p>
+                <p className="text-gray-500 dark:text-gray-300">Select any additional features you need.</p>
 
                 <SelectOptionReactSelect isRequired label="Material Preferences" errors={errors}
                                          name="materialPreferences"
@@ -145,7 +145,7 @@ export default function Step3A({onNext, onBack, formData}: {
 
                 <InputCustom isRequired type={"number"} label="Estimated Quantity" errors={errors}
                              name="estimatedQuantity" register={register}
-                             placeholder="1"></InputCustom>
+                             placeholder="0"></InputCustom>
 
                 <SelectOptionCustom label="Required Surface Finish" errors={errors} name="requiredSurfaceFinish"
                                     chosenTitle="Choose a Required Surface Finish"
@@ -153,22 +153,22 @@ export default function Step3A({onNext, onBack, formData}: {
                                     register={register}
                                     value={SurfaceValue}></SelectOptionCustom>
 
-                <div>
-                    <div className="mb-1 text-gray-500 flex justify-between">
+                <div >
+                    <div className="mb-1 text-gray-500 dark:text-gray-300 flex justify-between">
                         <label className="block text-sm font-medium">Do You Have Technical Drawings or CAD
                             Files?</label>
                         {errors?.fileNames && <p className="text-red-500 text-sm">{errors.fileNames.message}</p>}
                     </div>
                     <div onDrop={handleDrop}
                          onDragOver={handleDragOver}
-                         className="w-full py-9 bg-gray-50 rounded-md border border-gray-300 gap-3 grid border-dashed transition duration-300 ease">
+                         className="w-full py-9 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-300 gap-3 grid border-dashed transition duration-300 ease">
                         <div className="grid gap-1">
-                            <h2 className="text-center text-gray-400   text-xs leading-4">PDF, STEP, IGES, DXF, AI, PSD,
+                            <h2 className="text-center text-gray-400 dark:text-gray-300  text-xs leading-4">PDF, STEP, IGES, DXF, AI, PSD,
                                 PNG or JPG, smaller than
                                 15MB</h2>
                         </div>
                         <div className="grid gap-2">
-                            <h4 className="text-center text-gray-500 text-sm font-medium leading-snug">Drag and Drop
+                            <h4 className="text-center text-gray-500 dark:text-gray-400 text-sm font-medium leading-snug">Drag and Drop
                                 your file here or</h4>
                             <div className="flex items-center justify-center">
                                 <label>
@@ -187,12 +187,12 @@ export default function Step3A({onNext, onBack, formData}: {
                             {uploadProgress.map((item, index) => (
                                 <div key={index} className="mb-2">
                                     <div className="flex justify-between">
-                                        <p className="text-sm text-gray-600">{item.fileName}</p>
-                                        <span className="text-xs text-gray-500">{item.progress}%</span>
+                                        <p className="text-sm text-gray-600 dark:text-gray-300">{item.fileName}</p>
+                                        <span className="text-xs text-gray-500 dark:text-gray-300">{item.progress}%</span>
                                     </div>
                                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                                         <div
-                                            className="bg-[#eab308] h-2.5 rounded-full"
+                                            className="bg-[#eab308] h-2.5 rounded-full "
                                             style={{width: `${item.progress}%`}}
                                         ></div>
                                     </div>
@@ -206,7 +206,7 @@ export default function Step3A({onNext, onBack, formData}: {
 
             {/* Buttons */}
             <div className="flex justify-between mt-4">
-                <button onClick={onBack} className="text-gray-500 font-semibold px-4 py-2 rounded-md">
+                <button onClick={onBack} className="text-gray-500 dark:text-gray-300 font-semibold px-4 py-2 rounded-md">
                     Go Back
                 </button>
                 <button type={"submit"} className="bg-[#2083a0] text-white font-semibold px-4 py-2 rounded-md">

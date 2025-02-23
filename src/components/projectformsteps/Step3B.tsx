@@ -37,7 +37,7 @@ export default function Step3B({onNext, onBack, formData}: {
             <div className="flex-1 space-y-4">
 
                 <h2 className="text-2xl font-bold">Technical Specifications</h2>
-                <p className="text-gray-500">Select any additional features you need.</p>
+                <p className="text-gray-500 dark:text-gray-300">Select any additional features you need.</p>
 
                 <InputCustom isRequired label="Capacity" errors={errors} name="capacity" register={register}
                              placeholder="Capacity"></InputCustom>
@@ -58,7 +58,7 @@ export default function Step3B({onNext, onBack, formData}: {
 
             {/* Buttons */}
             <div className="flex justify-between mt-4">
-                <button onClick={onBack} className="text-gray-500 font-semibold px-4 py-2 rounded-md">
+                <button onClick={onBack} className="text-gray-500 dark:text-gray-300 font-semibold px-4 py-2 rounded-md">
                     Go Back
                 </button>
                 <button type={"submit"} className="bg-[#2083a0] text-white font-semibold px-4 py-2 rounded-md">

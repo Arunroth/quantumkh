@@ -42,7 +42,7 @@ export default function Step1({onNext, formData}: {
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full">
             <div className="flex-1 space-y-4">
                 <h2 className="text-2xl font-bold">Contact Info</h2>
-                <p className="text-gray-500">Please provide your name, email address, and phone number.</p>
+                <p className="text-gray-500 dark:text-gray-300">Please provide your name, email address, and phone number.</p>
 
                 <InputCustom
                     isRequired

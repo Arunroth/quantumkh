@@ -38,7 +38,7 @@ export default function Step2({onNext, onBack, formData}: {
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full">
             <div className="flex-1 space-y-4">
                 <h2 className="text-2xl font-bold">Project Type</h2>
-                <p className="text-gray-500">Choose a project type that suits your needs.</p>
+                <p className="text-gray-500 dark:text-gray-300">Choose a project type that suits your needs.</p>
 
                 <InputCustom
                     label="Project Name / Reference"
@@ -68,7 +68,7 @@ export default function Step2({onNext, onBack, formData}: {
                 />
             </div>
             <div className="flex justify-between mt-4">
-                <button onClick={onBack} className="text-gray-500 font-semibold px-4 py-2 rounded-md">
+                <button onClick={onBack} className="text-gray-500 dark:text-gray-300 font-semibold px-4 py-2 rounded-md">
                     Go Back
                 </button>
                 <button type="submit" className="bg-[#2083a0] text-white font-semibold px-4 py-2 rounded-md">
