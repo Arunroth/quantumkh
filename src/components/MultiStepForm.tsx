@@ -18,17 +18,21 @@ export default function MultiStepForm() {
     const nextStep = (data: Partial<RequestProjectFormData>) => {
         setFormData((prev) => ({...prev, ...data}));
         setStep((prev) => (prev < steps.length ? prev + 1 : prev));
-        if (step == 2 && !isContainInEnum(ServiceTypes, data.projectType) || data.projectType == 'other') {
+        if (step == 2 && !isContainInEnum(ServiceTypes, data.projectType) || data.projectType == 'Other') {
             setStep(4);
-        } else if (data.projectType === "DesignPrototyping".toLowerCase()) {
-            setIsDesignPrototype(true);
-        } else {
-            setIsDesignPrototype(false);
+        } else if (data.projectType) {
+            if (data.projectType === "DesignPrototyping") {
+                setIsDesignPrototype(true);
+            } else {
+                setIsDesignPrototype(false);
+            }
         }
+        console.log("on next", data.projectType, isDesignPrototype, formData.projectType);
     };
 
     const prevStep = () => {
-        if (step == 4 && !isContainInEnum(ServiceTypes, formData.projectType) || formData.projectType == 'other') {
+        console.log("on back", isDesignPrototype, formData.projectType);
+        if (step == 4 && !isContainInEnum(ServiceTypes, formData.projectType) || formData.projectType == 'Other') {
             setStep(2);
         } else {
             setStep((prev) => (prev > 1 ? prev - 1 : prev));

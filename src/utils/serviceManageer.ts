@@ -53,7 +53,6 @@ export function isContainInEnum<T>(o: { [s: string]: T; }, str?: string) {
     const enumValues = Object.keys(o)
         .filter((key) => isNaN(Number(key))) // Filter out numeric reverse mappings
         .map((key) => key.toLowerCase());
-    console.log(enumValues, str.toLowerCase())
     return enumValues.includes(str.toLowerCase());
 }
 
