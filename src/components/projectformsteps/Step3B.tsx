@@ -6,9 +6,9 @@ import {RequestProjectFormData} from "../../utils/contentManager.ts";
 import {getOptions, PreferDelivery} from "../../utils/serviceManageer.ts";
 
 const schema = z.object({
-    capacity: z.string().min(1, "Please choose some material(s)"),
+    capacity: z.string(),
     budgetRange: z.string(),
-    preferredDeliveryTimeline: z.string().min(1, "Please input the estimated quantity"),
+    preferredDeliveryTimeline: z.string().min(1, "Please choose a prefer delivery time"),
     exampleLink: z.string(),
 });
 
@@ -39,7 +39,7 @@ export default function Step3B({onNext, onBack, formData}: {
                 <h2 className="text-2xl font-bold">Technical Specifications</h2>
                 <p className="text-gray-500 dark:text-gray-300">Select any additional features you need.</p>
 
-                <InputCustom isRequired label="Capacity" errors={errors} name="capacity" register={register}
+                <InputCustom label="Capacity" errors={errors} name="capacity" register={register}
                              placeholder="Capacity"></InputCustom>
 
                 <InputCustom label="Budget Range (USD)" errors={errors} name="budgetRange" register={register}
@@ -58,7 +58,8 @@ export default function Step3B({onNext, onBack, formData}: {
 
             {/* Buttons */}
             <div className="flex justify-between mt-4">
-                <button onClick={onBack} className="text-gray-500 dark:text-gray-300 font-semibold px-4 py-2 rounded-md">
+                <button onClick={onBack}
+                        className="text-gray-500 dark:text-gray-300 font-semibold px-4 py-2 rounded-md">
                     Go Back
                 </button>
                 <button type={"submit"} className="bg-[#2083a0] text-white font-semibold px-4 py-2 rounded-md">

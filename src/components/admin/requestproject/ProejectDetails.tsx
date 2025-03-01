@@ -1,6 +1,13 @@
 import React, {useState} from "react";
 import {ResponseProject} from "../../../utils/contentManager.ts";
-import {API_BASE_URL} from "../../../utils/serviceManageer.ts";
+import {
+    API_BASE_URL,
+    FinishSurfaces,
+    getEnumValue,
+    PreferDelivery,
+    ServiceTypes,
+    ToleranceRequirements
+} from "../../../utils/serviceManageer.ts";
 
 
 interface ProjectDetailsProps {
@@ -111,7 +118,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({project}) => {
                 {isStep2Open && (
                     <div className="mt-2 pl-4 text-gray-700">
                         <p><strong>Project Name:</strong> {project.projectName || "N/A"}</p>
-                        <p><strong>Project Type:</strong> {project.projectType}</p>
+                        <p><strong>Project Type:</strong> {getEnumValue(ServiceTypes, project.projectType)}</p>
                         <p><strong>Description:</strong> {project.projectDescription}</p>
                     </div>
                 )}
@@ -141,7 +148,8 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({project}) => {
                                 <p><strong>Capacity:</strong> {project.capacity || "N/A"}</p>
                                 <p><strong>Budget Range:</strong> {project.budgetRange || "N/A"}</p>
                                 <p><strong>Preferred Delivery
-                                    Timeline:</strong> {project.preferredDeliveryTimeline || "N/A"}</p>
+                                    Timeline:</strong> {getEnumValue(PreferDelivery, project.preferredDeliveryTimeline)}
+                                </p>
                                 <p>
                                     <strong>Example Link:</strong>{" "}
                                     {project.exampleLink ? (
@@ -160,9 +168,12 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({project}) => {
                                     <strong>Material Preferences:</strong>{" "}
                                     {project.materialPreferences ? project.materialPreferences?.join(", ") : "N/A"}
                                 </p>
-                                <p><strong>Tolerance Requirement:</strong> {project.toleranceRequirement || "N/A"}</p>
+                                <p><strong>Tolerance
+                                    Requirement:</strong> {getEnumValue(ToleranceRequirements, project.toleranceRequirement)}
+                                </p>
                                 <p><strong>Estimated Quantity:</strong> {project.estimatedQuantity || "N/A"}</p>
-                                <p><strong>Required Surface Finish:</strong> {project.requiredSurfaceFinish || "N/A"}
+                                <p><strong>Required Surface
+                                    Finish:</strong> {getEnumValue(FinishSurfaces, project.requiredSurfaceFinish)}
                                 </p>
                                 <p>
                                     <strong>Files:</strong>{" "}

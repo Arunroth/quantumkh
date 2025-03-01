@@ -22,9 +22,9 @@ export enum FinishSurfaces {
 }
 
 export enum PreferDelivery {
-    Polishing = "Urgent (1-2 weeks)",
-    Painting = "Standard (3-6 weeks)",
-    PowderCoating = "Flexible"
+    Urgent = "Urgent (1-2 weeks)",
+    Standard = "Standard (3-6 weeks)",
+    Flexible = "Flexible"
 }
 
 export enum ServiceTypes {
@@ -54,6 +54,11 @@ export function isContainInEnum<T>(o: { [s: string]: T; }, str?: string) {
         .filter((key) => isNaN(Number(key))) // Filter out numeric reverse mappings
         .map((key) => key.toLowerCase());
     return enumValues.includes(str.toLowerCase());
+}
+
+export function getEnumValue<T extends Record<string, string>>(enumObj: T, key?: string): string | undefined {
+    if (!key) return 'N/A';
+    return enumObj[key as keyof T] ?? key;
 }
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://quantumkh-api.fifty-point.com';

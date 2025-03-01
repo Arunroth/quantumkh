@@ -18,6 +18,7 @@ export default function MultiStepForm() {
     const nextStep = (data: Partial<RequestProjectFormData>) => {
         setFormData((prev) => ({...prev, ...data}));
         setStep((prev) => (prev < steps.length ? prev + 1 : prev));
+        console.log(data, formData)
         if (step == 2 && (!isContainInEnum(ServiceTypes, data.projectType) || data.projectType == 'Other')) {
             setStep(4);
         } else if (data.projectType) {
@@ -39,7 +40,7 @@ export default function MultiStepForm() {
 
     const handleSubmit = async (data: Partial<RequestProjectFormData>) => {
         try {
-            const updatedFormData = { ...formData, ...data };
+            const updatedFormData = {...formData, ...data};
             const response = await fetch(`${API_BASE_URL}/request-projects`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
