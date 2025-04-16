@@ -101,27 +101,53 @@ export default function ProjectTracking() {
             <div className="px-6 py-5">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Project Timeline</h3>
               <div className="flex flex-col space-y-6">
-                {project.stages &&
-                  project.stages
-                    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                    .map((stage, index) => (
+              {project.stages &&
+                project.stages
+                  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                  .map((stage, index, arr) => {
+                    const now = new Date();
+                    const stageDate = new Date(stage.date);
+                    const isFuture = stageDate > now;
+
+                    // Find the index of the last past stage
+                    const lastPastStageIndex = [...arr]
+                      .reverse()
+                      .findIndex((s) => new Date(s.date) <= now);
+                    const actualLastPastIndex = lastPastStageIndex >= 0 ? arr.length - 1 - lastPastStageIndex : -1;
+
+                    const isLastPast = index === actualLastPastIndex;
+                    const formattedDate = getFormattedDate(stage.date);
+
+                    return (
                       <div key={index} className="flex items-start space-x-4 relative">
                         <div className="relative flex flex-col items-center">
-                          <div className={`h-6 w-6 rounded-full flex items-center justify-center ${
-                            index === project.stages.length - 1 ? "bg-green-500 text-white" : "bg-primary-500 text-white"
-                          }`}>
+                          <div className={`h-6 w-6 rounded-full flex items-center justify-center
+                            ${isFuture
+                              ? "bg-yellow-400 text-white"
+                              : isLastPast
+                              ? "bg-green-500 text-white"
+                              : "bg-primary-500 text-white"
+                            }`}>
                             <Package className="h-4 w-4" />
                           </div>
-                          {index !== project.stages.length - 1 && (
+                          {index !== arr.length - 1 && (
                             <div className="w-0.5 h-6 bg-gray-400 dark:bg-gray-600 mt-1"></div>
                           )}
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">{getFormattedDate(stage.date)}</p>
-                          <p className="text-lg font-medium text-gray-900 dark:text-white">{stage.name}</p>
+                          <p className={`text-sm ${isFuture ? "text-gray-400 dark:text-gray-500" : "text-gray-500 dark:text-gray-400"}`}>
+                            {formattedDate} {isFuture && <span className="italic text-xs">(Estimated)</span>}
+                          </p>
+                          <p className={`text-lg font-medium ${isFuture ? "text-gray-400 dark:text-gray-500" : "text-gray-900 dark:text-white"}`}>
+                            {stage.name}
+                          </p>
                         </div>
                       </div>
-                    ))}
+                    );
+                  })}
+
+
+
               </div>
 
               {/* Estimated Completion Date - Hide if Project is Completed */}
