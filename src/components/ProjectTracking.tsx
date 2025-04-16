@@ -108,14 +108,7 @@ export default function ProjectTracking() {
                     const now = new Date();
                     const stageDate = new Date(stage.date);
                     const isFuture = stageDate > now;
-
-                    // Find the index of the last past stage
-                    const lastPastStageIndex = [...arr]
-                      .reverse()
-                      .findIndex((s) => new Date(s.date) <= now);
-                    const actualLastPastIndex = lastPastStageIndex >= 0 ? arr.length - 1 - lastPastStageIndex : -1;
-
-                    const isLastPast = index === actualLastPastIndex;
+                    const isPastOrToday = stageDate <= now;
                     const formattedDate = getFormattedDate(stage.date);
 
                     return (
@@ -124,9 +117,7 @@ export default function ProjectTracking() {
                           <div className={`h-6 w-6 rounded-full flex items-center justify-center
                             ${isFuture
                               ? "bg-yellow-400 text-white"
-                              : isLastPast
-                              ? "bg-green-500 text-white"
-                              : "bg-primary-500 text-white"
+                              : "bg-green-500 text-white"
                             }`}>
                             <Package className="h-4 w-4" />
                           </div>
@@ -135,16 +126,25 @@ export default function ProjectTracking() {
                           )}
                         </div>
                         <div>
-                          <p className={`text-sm ${isFuture ? "text-gray-400 dark:text-gray-500" : "text-gray-500 dark:text-gray-400"}`}>
+                          <p className={`text-sm ${
+                            isFuture
+                              ? "text-gray-400 dark:text-gray-500"
+                              : "text-green-600 dark:text-green-400"
+                          }`}>
                             {formattedDate} {isFuture && <span className="italic text-xs">(Estimated)</span>}
                           </p>
-                          <p className={`text-lg font-medium ${isFuture ? "text-gray-400 dark:text-gray-500" : "text-gray-900 dark:text-white"}`}>
+                          <p className={`text-lg font-medium ${
+                            isFuture
+                              ? "text-gray-400 dark:text-gray-500"
+                              : "text-gray-900 dark:text-white"
+                          }`}>
                             {stage.name}
                           </p>
                         </div>
                       </div>
                     );
                   })}
+
 
 
 
