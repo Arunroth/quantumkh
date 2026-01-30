@@ -6,7 +6,7 @@ import {RequestProjectFormData} from "../../utils/contentManager.ts";
 
 const schema = z.object({
     shoppingLocation: z.string().optional(),
-    specialRequirements: z.string().optional(),
+    specialRequirements: z.string().max(2000, "Special requirements is too long").optional(),
 });
 
 type StepData = z.infer<typeof schema>;

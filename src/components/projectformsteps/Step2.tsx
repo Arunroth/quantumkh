@@ -8,7 +8,7 @@ import {getOptions, ServiceTypes} from "../../utils/serviceManageer.ts";
 const schema = z.object({
     projectName: z.string(),
     projectType: z.string().min(1, "Please select a project type"),
-    projectDescription: z.string().min(1, "Please input the description for more details"),
+    projectDescription: z.string().min(1, "Please input the description for more details").max(2000, "Description is too long"),
 });
 
 type StepData = z.infer<typeof schema>;

@@ -18,7 +18,6 @@ export default function MultiStepForm() {
     const nextStep = (data: Partial<RequestProjectFormData>) => {
         setFormData((prev) => ({...prev, ...data}));
         setStep((prev) => (prev < steps.length ? prev + 1 : prev));
-        console.log(data, formData)
         if (step == 2 && (!isContainInEnum(ServiceTypes, data.projectType) || data.projectType == 'Other')) {
             setStep(4);
         } else if (data.projectType) {
