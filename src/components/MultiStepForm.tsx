@@ -4,9 +4,13 @@ import Step2 from "./projectformsteps/Step2.tsx";
 import Step3A from "./projectformsteps/Step3A.tsx";
 import Step3B from "./projectformsteps/Step3B.tsx";
 import Step4 from "./projectformsteps/Step4.tsx";
-import {RequestProjectFormData} from "../utils/contentManager.ts";
 import SuccessMessage from "./projectformsteps/Step5.tsx";
-import {API_BASE_URL, isContainInEnum, ServiceTypes} from "../utils/serviceManageer.ts";
+import {createRequestProject} from "../lib/api/requestProjects.ts";
+import {
+    RequestProjectCreatedResponse,
+    RequestProjectFormData
+} from "../lib/types/requestProjects.ts";
+import {isContainInEnum, ServiceTypes} from "../utils/serviceManageer.ts";
 
 const steps = ["Contact Info", "Project Type", "Technical Specifications", "Additional Requests", "Successfully request!"];
 
@@ -14,6 +18,7 @@ export default function MultiStepForm() {
     const [step, setStep] = useState(1);
     const [isDesignPrototype, setIsDesignPrototype] = useState(false);
     const [formData, setFormData] = useState<Partial<RequestProjectFormData>>({});
+    const [submission, setSubmission] = useState<RequestProjectCreatedResponse | null>(null);
 
     const nextStep = (data: Partial<RequestProjectFormData>) => {
         setFormData((prev) => ({...prev, ...data}));
@@ -40,12 +45,8 @@ export default function MultiStepForm() {
     const handleSubmit = async (data: Partial<RequestProjectFormData>) => {
         try {
             const updatedFormData = {...formData, ...data};
-            const response = await fetch(`${API_BASE_URL}/request-projects`, {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(updatedFormData),
-            });
-            if (!response.ok) throw new Error("Failed to submit form");
+            const response = await createRequestProject(updatedFormData);
+            setSubmission(response);
             setFormData({});
             setStep(5);
         } catch (error) {
@@ -55,6 +56,7 @@ export default function MultiStepForm() {
 
     const handleReset = () => {
         setFormData({});
+        setSubmission(null);
         setStep(1);
         setIsDesignPrototype(false);
     };
@@ -107,7 +109,7 @@ export default function MultiStepForm() {
                                     <Step4 onBack={prevStep} onSubmit={handleSubmit} formData={formData}/>
                                 )}
                                 {step === 5 && (
-                                    <SuccessMessage onReset={handleReset}/>
+                                    <SuccessMessage onReset={handleReset} submission={submission}/>
                                 )}
                             </div>
                         </div>

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Edit2, Save, X, Plus, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Edit2, Save, X, Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { useContent } from "../../../context/ContentContext";
 import {
   contentManager,
@@ -7,6 +7,20 @@ import {
   ProjectStatus,
   ProjectStatusEnum,
 } from "./../../../utils/contentManager";
+
+const PREDEFINED_STAGES = [
+  "Review",
+  "Design Confirmation",
+  "Material Approval",
+  "CNC Drawing",
+  "Cutting",
+  "Custom Process",
+  "Quality Control",
+  "Packaging",
+  "Out for Delivery",
+  "Arrived",
+  "Completed",
+];
 
 export default function ProjectsEditor() {
   const {
@@ -20,6 +34,35 @@ export default function ProjectsEditor() {
     null
   );
   const [stages, setStages] = useState<ProjectStage[]>([]);
+  const [expandedIds, setExpandedIds] = useState<string[]>([]);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (message: string) => {
+    setToastMessage(message);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3000);
+  };
+
+  useEffect(() => {
+    if (!editedContent) return;
+    let newStatus = ProjectStatusEnum.QUEUED;
+    if (stages.some(s => s.status === ProjectStatusEnum.IN_PROGRESS)) {
+      newStatus = ProjectStatusEnum.IN_PROGRESS;
+    }
+    if (stages.every(s => s.status === ProjectStatusEnum.COMPLETED)) {
+      newStatus = ProjectStatusEnum.COMPLETED;
+    }
+    if (newStatus !== editedContent.status) {
+      setEditedContent(prev => prev ? { ...prev, status: newStatus } : null);
+    }
+  }, [stages, editedContent?.status]);
+
+  const toggleExpand = (id: string) => {
+    setExpandedIds(prev => 
+      prev.includes(id) ? prev.filter(pid => pid !== id) : [...prev, id]
+    );
+  };
 
   const currentDate = new Date();
   const formattedDate = currentDate.toISOString().split("T")[0];
@@ -29,7 +72,7 @@ export default function ProjectsEditor() {
       setStages(project.stages);
     } else {
       setStages([
-        { projectid: project?.id ?? "", name: "", date: formattedDate },
+        { projectid: project?.id ?? "", name: "", date: formattedDate, status: ProjectStatusEnum.QUEUED },
       ]);
     }
   };
@@ -37,7 +80,7 @@ export default function ProjectsEditor() {
   const addStage = () => {
     setStages([
       ...stages,
-      { projectid: editedContent?.id ?? "", name: "", date: formattedDate },
+      { projectid: editedContent?.id ?? "", name: "", date: formattedDate, status: ProjectStatusEnum.QUEUED },
     ]);
   };
 
@@ -50,6 +93,7 @@ export default function ProjectsEditor() {
         }
         if (isDelete) {
           setStages(stages.filter((_, i) => i !== index));
+          showToast("Stage deleted successfully!");
         }
       }
     };
@@ -63,9 +107,27 @@ export default function ProjectsEditor() {
 
   const handleSave = async () => {
     if (editedContent) {
-      await updateProjectStatus(editedContent.id, editedContent, stages);
-      setEditingId(null);
-      setEditedContent(null);
+      // Validation: Ensure all stages have a selected name
+      if (stages.some((stage) => !stage.name || stage.name.trim() === "")) {
+        alert("Please select a Stage Name for all stages before saving.");
+        return;
+      }
+
+      const calculatedProgress = stages.length === 0 ? 0 : Math.round((stages.filter(s => s.status === ProjectStatusEnum.COMPLETED).length / stages.length) * 100);
+      const contentToSave = {
+        ...editedContent,
+        progress: calculatedProgress
+      };
+
+      try {
+        await updateProjectStatus(contentToSave.id, contentToSave, stages);
+        setEditingId(null);
+        setEditedContent(null);
+        showToast("Tracking project saved successfully!");
+      } catch (e) {
+        alert(e instanceof Error ? e.message : "Failed to save tracking project stages");
+        return; // Don't clear stages if it failed
+      }
     }
     setStages([]);
   };
@@ -76,7 +138,7 @@ export default function ProjectsEditor() {
     setStages([]);
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     const newProject = {
       name: "New Tracking Project",
       status: ProjectStatusEnum.QUEUED,
@@ -88,7 +150,12 @@ export default function ProjectsEditor() {
       vat: "",
       stages: [],
     };
-    addProjectStatus(newProject);
+    try {
+      await addProjectStatus(newProject);
+      showToast("New tracking project added successfully!");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Failed to add tracking project");
+    }
   };
 
   const handleDelete = (id: string) => {
@@ -96,6 +163,7 @@ export default function ProjectsEditor() {
       window.confirm("Are you sure you want to delete this tracking project?")
     ) {
       deleteProjectStatus(id);
+      showToast("Tracking project deleted successfully!");
     }
   };
 
@@ -202,22 +270,17 @@ export default function ProjectsEditor() {
                   </select>
                 </div>
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-900 dark:text-white">
-                    Processing Percentage (%)
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                    Processing Percentage
                   </label>
-                  <input
-                    type="number"
-                    value={editedContent?.progress}
-                    onChange={(e) =>
-                      setEditedContent({
-                        ...editedContent!,
-                        progress: e.target.value
-                          ? parseInt(e.target.value, 10)
-                          : 0,
-                      })
-                    }
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  />
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-5">
+                    <div
+                      className="bg-primary-500 h-5 rounded-full transition-all duration-500 text-xs text-white text-center flex items-center justify-center font-medium"
+                      style={{ width: `${stages.length === 0 ? 0 : Math.round((stages.filter(s => s.status === ProjectStatusEnum.COMPLETED).length / stages.length) * 100)}%` }}
+                    >
+                      {stages.length === 0 ? 0 : Math.round((stages.filter(s => s.status === ProjectStatusEnum.COMPLETED).length / stages.length) * 100)}%
+                    </div>
+                  </div>
                 </div>
 
                 <div className="mt-4">
@@ -233,46 +296,104 @@ export default function ProjectsEditor() {
 
                   {stages &&
                     stages.map((stage, index) => (
-                      <div className="flex space-x-4 mb-2" key={index}>
-                        <div className="w-2/4">
-                          <input
-                            type="text"
-                            value={stage?.name}
-                            onChange={(e) => {
-                              const updatedStages = [...stages]; // Create a shallow copy of stages
-                              updatedStages[index] = {
-                                ...stage,
-                                name: e.target.value,
-                              }; // Update the specific stage
-                              setStages(updatedStages); // Set the updated stages array
-                            }}
-                            placeholder="Stage Name"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                          />
+                      <div className="flex flex-col space-y-2 mb-4 p-3 border rounded dark:border-gray-700" key={index}>
+                        <div className="flex space-x-2">
+                          <div className="w-1/2">
+                            <input
+                              type="text"
+                              value={stage?.name || ""}
+                              onChange={(e) => {
+                                const updatedStages = [...stages];
+                                updatedStages[index] = {
+                                  ...stage,
+                                  name: e.target.value,
+                                };
+                                setStages(updatedStages);
+                              }}
+                              list={`stage-options-${index}`}
+                              placeholder="Enter or select stage name"
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            />
+                            <datalist id={`stage-options-${index}`}>
+                              {PREDEFINED_STAGES.map((predef) => (
+                                <option key={predef} value={predef} />
+                              ))}
+                            </datalist>
+                          </div>
+                          <div className="w-1/2">
+                            <input
+                              type="date"
+                              value={getFormattedDate(stage?.date)}
+                              onChange={(e) => {
+                                const updatedStages = [...stages]; // Create a shallow copy of stages
+                                updatedStages[index] = {
+                                  ...stage,
+                                  date: e.target.value,
+                                }; // Update the specific stage
+                                setStages(updatedStages); // Set the updated stages array
+                              }}
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            />
+                          </div>
                         </div>
-
-                        <div className="w-2/4">
-                          <input
-                            type="date"
-                            value={getFormattedDate(stage?.date)}
-                            onChange={(e) => {
-                              const updatedStages = [...stages]; // Create a shallow copy of stages
-                              updatedStages[index] = {
-                                ...stage,
-                                date: e.target.value,
-                              }; // Update the specific stage
-                              setStages(updatedStages); // Set the updated stages array
-                            }}
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                          />
-                        </div>
-                        <div className="w-1/5 py-2">
-                          <button
-                            onClick={removeStage(index)}
-                            className="flex items-center ml-2 bg-transparent hover:bg-red-500 text-red-700 font-semibold hover:text-white py-1 px-2 border border-red-500 hover:border-transparent rounded"
-                          >
-                            <Trash2 className="h-4 w-4 " />
-                          </button>
+                        <div className="flex space-x-2 items-center">
+                          <div className="w-flex-1 w-full">
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md p-2">
+                              <label className="flex items-center space-x-1 cursor-pointer">
+                                <input
+                                  type="radio"
+                                  name={`status-${index}`}
+                                  value={ProjectStatusEnum.QUEUED}
+                                  checked={!stage.status || stage.status === ProjectStatusEnum.QUEUED}
+                                  onChange={(e) => {
+                                    const updatedStages = [...stages];
+                                    updatedStages[index] = { ...stage, status: e.target.value };
+                                    setStages(updatedStages);
+                                  }}
+                                  className="text-blue-600 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500"
+                                />
+                                <span className="text-sm text-gray-700 dark:text-gray-300">Queued</span>
+                              </label>
+                              <label className="flex items-center space-x-1 cursor-pointer">
+                                <input
+                                  type="radio"
+                                  name={`status-${index}`}
+                                  value={ProjectStatusEnum.IN_PROGRESS}
+                                  checked={stage.status === ProjectStatusEnum.IN_PROGRESS}
+                                  onChange={(e) => {
+                                    const updatedStages = [...stages];
+                                    updatedStages[index] = { ...stage, status: e.target.value };
+                                    setStages(updatedStages);
+                                  }}
+                                  className="text-blue-600 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500"
+                                />
+                                <span className="text-sm text-gray-700 dark:text-gray-300">In Progress</span>
+                              </label>
+                              <label className="flex items-center space-x-1 cursor-pointer">
+                                <input
+                                  type="radio"
+                                  name={`status-${index}`}
+                                  value={ProjectStatusEnum.COMPLETED}
+                                  checked={stage.status === ProjectStatusEnum.COMPLETED}
+                                  onChange={(e) => {
+                                    const updatedStages = [...stages];
+                                    updatedStages[index] = { ...stage, status: e.target.value };
+                                    setStages(updatedStages);
+                                  }}
+                                  className="text-blue-600 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500"
+                                />
+                                <span className="text-sm text-gray-700 dark:text-gray-300">Completed</span>
+                              </label>
+                            </div>
+                          </div>
+                          <div>
+                            <button
+                              onClick={removeStage(index)}
+                              className="flex items-center ml-2 bg-transparent hover:bg-red-500 text-red-700 font-semibold hover:text-white py-2 px-3 border border-red-500 hover:border-transparent rounded"
+                            >
+                              <Trash2 className="h-4 w-4 " />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -380,6 +501,16 @@ export default function ProjectsEditor() {
 
                     <div className="flex space-x-2">
                       <button
+                        onClick={() => toggleExpand(project.id)}
+                        className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                      >
+                        {expandedIds.includes(project.id) ? (
+                          <ChevronUp className="h-5 w-5" />
+                        ) : (
+                          <ChevronDown className="h-5 w-5" />
+                        )}
+                      </button>
+                      <button
                         onClick={() => handleEdit(project)}
                         className="text-primary-600 hover:text-primary-700 dark:text-primary-400"
                       >
@@ -394,27 +525,68 @@ export default function ProjectsEditor() {
                     </div>
                   </div>
                 </div>
-                <div className="px-4 pb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      Progress
-                    </span>
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      {project.progress}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                    <div
-                      className="bg-primary-500 h-2.5 rounded-full transition-all duration-500"
-                      style={{ width: `${project.progress}%` }}
-                    ></div>
-                  </div>
-                </div>
+
+                {expandedIds.includes(project.id) && (
+                  <>
+                    <div className="px-4 pb-4">
+                      {project.stages && project.stages.length > 0 && (
+                        <div className="mt-2 space-y-3 pt-2">
+                          <h4 className="text-sm font-medium text-gray-900 dark:text-white">Stages Tracking</h4>
+                          {project.stages.map((stage, idx) => (
+                            <div key={idx} className="flex flex-col bg-gray-50 dark:bg-gray-800 p-3 rounded border dark:border-gray-700">
+                              <div className="flex justify-between items-center text-sm mb-2">
+                                <span className="font-medium text-gray-800 dark:text-gray-200">{stage.name}</span>
+                                <span className="text-xs text-gray-500">{stage?.date ? stage.date.slice(0, 10) : ""}</span>
+                              </div>
+                              <div className="flex space-x-2">
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium ${(!stage.status || stage.status === ProjectStatusEnum.QUEUED) ? 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200' : 'bg-gray-100 text-gray-400 dark:bg-gray-900 dark:text-gray-600'}`}>
+                                  QUEUE
+                                </span>
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium ${stage.status === ProjectStatusEnum.IN_PROGRESS ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' : 'bg-gray-100 text-gray-400 dark:bg-gray-900 dark:text-gray-600'}`}>
+                                  IN PROGRESS
+                                </span>
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium ${stage.status === ProjectStatusEnum.COMPLETED ? 'bg-primary-100 text-primary-800 dark:bg-primary-900/20 dark:text-primary-400' : 'bg-gray-100 text-gray-400 dark:bg-gray-900 dark:text-gray-600'}`}>
+                                  COMPLETED
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="px-4 pb-6">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          Progress
+                        </span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          {project.progress}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                        <div
+                          className="bg-primary-500 h-2.5 rounded-full transition-all duration-500"
+                          style={{ width: `${project.progress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
         ))}
       </div>
+      
+      {toastMessage && (
+        <div className="fixed bottom-4 right-4 z-50 flex items-center p-4 mb-4 text-sm text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800 shadow-lg" role="alert">
+          <svg className="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
+          </svg>
+          <span className="sr-only">Success</span>
+          <div>{toastMessage}</div>
+        </div>
+      )}
     </div>
   );
 }

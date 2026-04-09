@@ -11,7 +11,7 @@ export default function Hero() {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-dark-900 dark:text-white leading-tight">
+            <h1 className="text-4xl font-bold leading-tight text-gray-900 dark:text-white md:text-5xl">
               {hero.title}
               <span className="block text-primary-500">{hero.subtitle}</span>
             </h1>

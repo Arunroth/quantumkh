@@ -87,18 +87,11 @@ export default function ClientsEditor() {
         const style = {
             transform: CSS.Transform.toString(transform),
             transition,
-            padding: "16px",
-            margin: "8px",
-            backgroundColor: "#fdfdfc",
-            borderRadius: "8px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center"
         };
         return (
             <div
                 key={client.id}
-                className="border dark:border-gray-700 rounded-lg overflow-hidden"
+                className="m-2 rounded-lg overflow-hidden bg-gray-50 dark:bg-dark-800"
                 ref={setNodeRef} style={style}
             >
                 {editingId === client.id ? (

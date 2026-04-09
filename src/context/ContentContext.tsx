@@ -36,18 +36,31 @@ interface ContentContextType {
     deleteClient: (id: string) => Promise<Client[]>;
     searchProjectStatus: (ids: string) => Promise<ProjectStatus[]>;
     projectStatus: ProjectStatus[];
-    addProjectStatus: (
-        projectStatus: Omit<ProjectStatus, "id" | "projectid">
-    ) => void;
+    addProjectStatus: (projectStatus: Omit<ProjectStatus, "id">) => Promise<void>;
     updateProjectStatus: (
         id: string,
         updatedStatus: ProjectStatus,
         stages: ProjectStage[]
-    ) => Promise<ProjectStatus[]>;
+    ) => Promise<ProjectStatus | null>;
     deleteProjectStatus: (id: string) => void;
+    isLoading: boolean;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
+const INITIAL_LOAD_TIMEOUT_MS = 3000;
+
+async function withFallback<T>(promise: Promise<T>, fallback: T): Promise<T> {
+    try {
+        return await Promise.race([
+            promise,
+            new Promise<T>((resolve) =>
+                setTimeout(() => resolve(fallback), INITIAL_LOAD_TIMEOUT_MS)
+            ),
+        ]);
+    } catch {
+        return fallback;
+    }
+}
 
 export function ContentProvider({children}: { children: ReactNode }) {
     const [hero, setHero] = useState<Hero>({
@@ -61,23 +74,45 @@ export function ContentProvider({children}: { children: ReactNode }) {
     const [projects, setProjects] = useState<Project[]>([]);
     const [clients, setClients] = useState<Client[]>([]);
     const [projectStatus, setProjectStatus] = useState<ProjectStatus[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        const fetchClients = async () => {
+        const fetchAllData = async () => {
             try {
-                setHero(await contentManager.getHero());
-                setClients(await contentManager.getClients());
-                setServices(await contentManager.getServices());
-                setMachines(await contentManager.getMachines());
-                setProjects(await contentManager.getProjects());
-                setFeatures(await contentManager.getFeatures());
-                setProjectStatus(await contentManager.getProjectStatus());
+                setIsLoading(true);
+                const [
+                    heroData,
+                    clientsData,
+                    servicesData,
+                    machinesData,
+                    projectsData,
+                    featuresData,
+                    projectStatusData
+                ] = await Promise.all([
+                    withFallback(contentManager.getHero(), hero),
+                    withFallback(contentManager.getClients(), clients),
+                    withFallback(contentManager.getServices(), services),
+                    withFallback(contentManager.getMachines(), machines),
+                    withFallback(contentManager.getProjects(), projects),
+                    withFallback(contentManager.getFeatures(), features),
+                    withFallback(contentManager.getProjectStatus(), projectStatus),
+                ]);
+
+                setHero(heroData);
+                setClients(clientsData);
+                setServices(servicesData);
+                setMachines(machinesData);
+                setProjects(projectsData);
+                setFeatures(featuresData);
+                setProjectStatus(projectStatusData);
             } catch (error) {
-                console.error("Error fetching clients:", error);
+                console.error("Error fetching data:", error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
-        fetchClients();
+        fetchAllData();
     }, []);
 
     const updateHero = async (newHero: Hero) => {
@@ -185,9 +220,7 @@ export function ContentProvider({children}: { children: ReactNode }) {
         return await contentManager.getProjectStatusById(ids);
     };
 
-    const addProjectStatus = async (
-        projectStatus: Omit<ProjectStatus, "id" | "projectid">
-    ) => {
+    const addProjectStatus = async (projectStatus: Omit<ProjectStatus, "id">) => {
         const data = await contentManager.addProjectStatus(projectStatus);
         setProjectStatus([...data]);
     };
@@ -199,9 +232,9 @@ export function ContentProvider({children}: { children: ReactNode }) {
     ) => {
         const data = await contentManager.updateProjectStatus(id, updatedStatus, stages);
         if (data) {
-            setProjectStatus(projectStatus.map((p) => (p.id === id ? data : p)));
+            setProjectStatus((prev) => prev.map((p) => (p.id === id ? data : p)));
         }
-        return projectStatus;
+        return data;
     };
 
     const deleteProjectStatus = async (id: string) => {
@@ -240,6 +273,7 @@ export function ContentProvider({children}: { children: ReactNode }) {
                 addProjectStatus,
                 updateProjectStatus,
                 deleteProjectStatus,
+                isLoading,
             }}
         >
             {children}

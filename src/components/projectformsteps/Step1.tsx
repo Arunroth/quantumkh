@@ -2,7 +2,7 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
 import {InputCustom, SelectOption} from "../common/SelectOption"; // Adjust path
-import {RequestProjectFormData} from "../../utils/contentManager.ts"; // Adjust path
+import {RequestProjectFormData} from "../../lib/types/requestProjects.ts";
 import {ContactMethods, getOptions} from "../../utils/serviceManageer.ts"; // Adjust path
 
 const schema = z.object({

@@ -61,20 +61,20 @@ export default function Clients() {
   };
 
   return (
-    <div className="bg-gray-50 dark:bg-dark-800 py-24 transition-colors w-full">
-      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="w-full bg-gray-50 py-24 transition-colors dark:bg-dark-800">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
             Trusted by Industry Leaders
           </h2>
-          <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
+          <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
             Delivering Excellence to Companies Worldwide
           </p>
         </div>
 
         {/* Auto-scrolling & draggable slider (Now works on mobile & PC) */}
         <div
-          className="mt-12 relative w-full overflow-hidden cursor-grab active:cursor-grabbing"
+          className="relative mt-16 w-full cursor-grab overflow-hidden active:cursor-grabbing"
           ref={sliderRef}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -92,7 +92,7 @@ export default function Clients() {
             {clients.concat(clients).map((client, index) => (
               <div
                 key={client.id + "-" + index}
-                className="flex-none w-56 bg-white mb-4  select-none dark:bg-dark-900 rounded-lg p-4 shadow-md"
+                className="mb-4 flex-none w-56 select-none rounded-lg bg-white p-4 shadow-lg transition-shadow hover:shadow-xl dark:bg-dark-900 dark:shadow-black/30 dark:hover:shadow-black/40"
               >
                 <div className="flex items-center justify-center h-20 mb-3">
                   <img

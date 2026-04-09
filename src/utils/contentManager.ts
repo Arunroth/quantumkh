@@ -59,8 +59,9 @@ export enum ProjectStatusEnum {
 export interface ProjectStage {
     id?: string;
     projectid: string;
-    name: string,
-    date?: string
+    name: string;
+    date?: string;
+    status?: string;
 }
 
 export interface ProjectStatus {
@@ -508,7 +509,7 @@ class ContentManager {
         // Manually join the data
         this.projectStatus = this.projectStatus.map(status => ({
             ...status,
-            stages: stages.filter(stage => stage.projectid === status.id).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+            stages: stages.filter(stage => stage.projectid === status.id).sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime())
         }));
 
         return this.projectStatus;
@@ -536,8 +537,45 @@ class ContentManager {
         return this.projectStatus;
     }
 
-    async addProjectStatus(projectStatus: Omit<ProjectStatus, "id" | "projectid">): Promise<ProjectStatus[]> {
-        const newData = {...projectStatus, projectid: `PJR${Math.floor(1000 + Math.random() * 9000)}`};
+    /**
+     * Look up a tracking row by public identify number + VAT without mutating the in-memory list.
+     */
+    async lookupTrackingByIdentifyAndVat(
+        projectId: string,
+        vat: string,
+    ): Promise<ProjectStatus | null> {
+        const pid = projectId.trim().toUpperCase();
+        const v = vat.trim().toUpperCase();
+        if (!pid || !v) return null;
+        const {data, error} = await supabase
+            .from('project_status')
+            .select('*')
+            .eq('projectid', pid)
+            .eq('vat', v)
+            .limit(1);
+        if (error || !data?.length) {
+            if (error) console.error('Error looking up tracking:', error);
+            return null;
+        }
+        const row = data[0] as ProjectStatus;
+        const {data: stages} = await supabase
+            .from('project_stages')
+            .select('*')
+            .eq('projectid', row.id);
+        return {...row, stages: (stages as ProjectStage[]) || []};
+    }
+
+    async addProjectStatus(projectStatus: Omit<ProjectStatus, "id">): Promise<ProjectStatus[]> {
+        const trimmedPid = (projectStatus.projectid || '').trim();
+        const projectid = trimmedPid
+            ? trimmedPid.toUpperCase()
+            : `PJR${Math.floor(1000 + Math.random() * 9000)}`;
+        const vat = (projectStatus.vat || '').trim().toUpperCase();
+        const newData = {
+            ...projectStatus,
+            projectid,
+            vat,
+        };
         delete newData.stages;
         const {data, error} = await supabase
             .from('project_status')
@@ -545,11 +583,27 @@ class ContentManager {
 
         if (error) {
             console.error('Error creating project status:', error);
-        } else {
-            this.projectStatus.push(data[0]); // Add the new project status to the list
+            throw new Error(error.message || 'Failed to create tracking project');
         }
-        console.log('Project status:', this.projectStatus);
-        return this.projectStatus; // Return the created project status
+        const row = data![0] as ProjectStatus;
+        const stagePayload = {
+            projectid: row.id,
+            name: row.stage,
+            date: row.startdate,
+        };
+        const {data: stageInserted, error: stageErr} = await supabase
+            .from('project_stages')
+            .insert([stagePayload])
+            .select();
+        if (stageErr) {
+            console.error('Error creating initial project stage:', stageErr);
+        }
+        const withStages: ProjectStatus = {
+            ...row,
+            stages: stageInserted?.[0] ? [stageInserted[0] as ProjectStage] : [],
+        };
+        this.projectStatus.push(withStages);
+        return this.projectStatus;
     }
 
 
@@ -571,24 +625,29 @@ class ContentManager {
                 if (stage.id == "" || stage.id == undefined) {
                     const {data, error} = await supabase.from('project_stages').insert(stage).select();
                     if (error) {
-                        console.error('Error updating project status:', error);
+                        console.error('Error adding project stage:', error);
+                        throw new Error(error.message);
                     }
-                    updatedStages.push(data![0] as ProjectStage);
+                    if (data && data.length > 0) {
+                        updatedStages.push(data[0] as ProjectStage);
+                    }
                 } else {
                     const {data: updatedStage, error} = await supabase
                         .from('project_stages')
                         .update(stage)
                         .eq('id', stage.id).select();
                     if (error) {
-                        console.error('Error updating project status:', error);
+                        console.error('Error updating project stage:', error);
+                        throw new Error(error.message);
                     }
-                    updatedStages.push(updatedStage![0] as ProjectStage);
+                    if (updatedStage && updatedStage.length > 0) {
+                        updatedStages.push(updatedStage[0] as ProjectStage);
+                    }
                 }
             }
         }
 
         updatedStatus.stages = updatedStages;
-
 
         if (error) {
             console.error('Error updating project status:', error);

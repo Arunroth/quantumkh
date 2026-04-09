@@ -16,13 +16,21 @@ const ADMIN_CREDENTIALS = {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('isAdminAuthenticated') === 'true';
+    try {
+      return localStorage.getItem('isAdminAuthenticated') === 'true';
+    } catch {
+      return false;
+    }
   });
 
   const login = (username: string, password: string) => {
     if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
       setIsAuthenticated(true);
-      localStorage.setItem('isAdminAuthenticated', 'true');
+      try {
+        localStorage.setItem('isAdminAuthenticated', 'true');
+      } catch {
+        // Ignore storage failures so local login still works for the current session.
+      }
       return true;
     }
     return false;
@@ -30,7 +38,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem('isAdminAuthenticated');
+    try {
+      localStorage.removeItem('isAdminAuthenticated');
+    } catch {
+      // Ignore storage failures so logout still clears in-memory auth state.
+    }
   };
 
   return (

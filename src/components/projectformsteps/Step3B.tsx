@@ -2,7 +2,7 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
 import {InputCustom, SelectOption, TextAreaCustom} from "../common/SelectOption";
-import {RequestProjectFormData} from "../../utils/contentManager.ts";
+import {RequestProjectFormData} from "../../lib/types/requestProjects.ts";
 import {getOptions, PreferDelivery} from "../../utils/serviceManageer.ts";
 
 const schema = z.object({

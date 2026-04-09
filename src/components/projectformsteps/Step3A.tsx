@@ -2,11 +2,13 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
 import {InputCustom, SelectOptionCustom} from "../common/SelectOption";
-import {FileName, RequestProjectFormData} from "../../utils/contentManager.ts";
-import axios from "axios";
 import {useState} from "react";
+import {uploadRequestProjectFiles} from "../../lib/api/requestProjects.ts";
 import {
-    API_BASE_URL,
+    RequestProjectFileReference,
+    RequestProjectFormData
+} from "../../lib/types/requestProjects.ts";
+import {
     FinishSurfaces,
     getOptions,
     MaterialPreferences,
@@ -49,7 +51,7 @@ export default function Step3A({onNext, onBack, formData}: {
     const ToleranceValue = watch("toleranceRequirement");
     const SurfaceValue = watch("requiredSurfaceFinish");
 
-    const fileNames: FileName[] = watch("fileNames") || [];
+    const fileNames: RequestProjectFileReference[] = watch("fileNames") || [];
     const [uploadProgress, setUploadProgress] = useState<
         { fileName: string; progress: number }[]
     >(fileNames.map((file) => ({fileName: file.originalFilename, progress: 100})));
@@ -78,11 +80,7 @@ export default function Step3A({onNext, onBack, formData}: {
 
     // Upload files to API with progress tracking
     const uploadFiles = async (files: FileList) => {
-        const formData = new FormData();
         const fileArray = Array.from(files);
-        fileArray.forEach((file) => {
-            formData.append("files", file); // Match the 'files' field name from NestJS
-        });
 
         // Initialize progress tracking for each file
         const appendUploadFiles = [
@@ -92,28 +90,15 @@ export default function Step3A({onNext, onBack, formData}: {
         setUploadProgress(appendUploadFiles);
 
         try {
-            const response = await axios.post(`${API_BASE_URL}/request-projects/upload-files`, formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-                onUploadProgress: (progressEvent) => {
-                    const total = progressEvent.total || 1; // Avoid division by zero
-                    const percentCompleted = Math.round((progressEvent.loaded * 100) / total);
-
-                    // Update progress for all files (simplified approach)
-                    setUploadProgress((prev: { fileName: string; progress: number }[]) =>
-                        prev.map((item) => ({
-                            ...item,
-                            progress: percentCompleted,
-                        }))
-                    );
-                },
-            });
-
-            const uploadedFiles: FileName[] = response.data; // Expecting array of { originalFilename, filename }
+            const uploadedFiles = await uploadRequestProjectFiles(fileArray);
             const updatedFileNames = [...fileNames, ...uploadedFiles];
-            setValue("fileNames", updatedFileNames); // Append new filenames
-            // setUploadProgress([]); // Clear progress after upload
+            setUploadProgress((prev) =>
+                prev.map((item) => ({
+                    ...item,
+                    progress: 100,
+                }))
+            );
+            setValue("fileNames", updatedFileNames);
         } catch (error) {
             console.error("Error uploading files:", error);
             setUploadProgress([]); // Clear progress on error
