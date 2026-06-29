@@ -5,9 +5,8 @@ import ServicesEditor from './editors/ServicesEditor';
 import MachinesEditor from './editors/MachinesEditor';
 import ProjectsEditor from './editors/ProjectsEditor';
 import ClientsEditor from './editors/ClientsEditor';
-import ProjectStatusEditor from './editors/ProjectStatusEditor';
 
-type EditorSection = 'hero' | 'features' | 'services' | 'machines' | 'projects' | 'project_tracking' | 'clients';
+type EditorSection = 'hero' | 'features' | 'services' | 'machines' | 'projects' | 'clients';
 
 export default function ContentManager() {
   const [activeSection, setActiveSection] = useState<EditorSection>('hero');
@@ -18,7 +17,6 @@ export default function ContentManager() {
     { id: 'services', name: 'Services' },
     { id: 'machines', name: 'Machines' },
     { id: 'projects', name: 'Projects' },
-    { id: 'project_tracking', name: 'Project tracking' },
     { id: 'clients', name: 'Clients' },
   ];
 
@@ -50,7 +48,6 @@ export default function ContentManager() {
         {activeSection === 'services' && <ServicesEditor />}
         {activeSection === 'machines' && <MachinesEditor />}
         {activeSection === 'projects' && <ProjectsEditor />}
-        {activeSection === 'project_tracking' && <ProjectStatusEditor />}
         {activeSection === 'clients' && <ClientsEditor />}
       </div>
     </div>

@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 
 import {
   getTrackingStageIconToken,
-  formatTrackingStageLabel,
   formatTrackingIdentifierLine,
   formatTrackingStatusLabel,
   normalizeTrackingLookupInput,
@@ -12,56 +11,75 @@ describe('normalizeTrackingLookupInput', () => {
   it('accepts separate tracking code and VAT inputs', () => {
     expect(
       normalizeTrackingLookupInput({
-        trackingCode: 'prj-123e4567e89b',
+        trackingCode: 'prj-a1b2c3d4',
         vat: 'k123456789',
       }),
     ).toEqual({
-      projectId: 'PRJ-123E4567E89B',
+      referenceNo: 'PRJ-A1B2C3D4',
       vat: 'K123456789',
+    });
+  });
+
+  it('allows a blank VAT for individual customers', () => {
+    expect(
+      normalizeTrackingLookupInput({
+        trackingCode: 'prj-a1b2c3d4',
+        vat: '',
+      }),
+    ).toEqual({
+      referenceNo: 'PRJ-A1B2C3D4',
+      vat: '',
     });
   });
 
   it('supports the legacy combined input format when VAT is blank', () => {
     expect(
       normalizeTrackingLookupInput({
-        trackingCode: 'PRJ-123E4567E89B, K123456789',
+        trackingCode: 'PRJ-A1B2C3D4, K123456789',
         vat: '',
       }),
     ).toEqual({
-      projectId: 'PRJ-123E4567E89B',
+      referenceNo: 'PRJ-A1B2C3D4',
+      vat: 'K123456789',
+    });
+  });
+
+  it('accepts numeric project or quote reference numbers', () => {
+    expect(
+      normalizeTrackingLookupInput({
+        trackingCode: '260001',
+        vat: 'k123456789',
+      }),
+    ).toEqual({
+      referenceNo: '260001',
       vat: 'K123456789',
     });
   });
 });
 
 describe('tracking labels', () => {
-  it('assigns distinct icon tokens to the main tracking stages', () => {
-    expect(getTrackingStageIconToken('CONFIRM')).toBe('confirm');
-    expect(getTrackingStageIconToken('DESIGN_CONFIRM')).toBe('design');
-    expect(getTrackingStageIconToken('MATERIAL_APPROVAL')).toBe('approval');
-    expect(getTrackingStageIconToken('CUSTOM_PROCESS')).toBe('process');
-    expect(getTrackingStageIconToken('PACKAGING')).toBe('packaging');
-    expect(getTrackingStageIconToken('OUT_FOR_DELIVERY')).toBe('delivery');
-    expect(getTrackingStageIconToken('ARRIVED')).toBe('arrived');
-    expect(getTrackingStageIconToken('COMPLETED')).toBe('completed');
-    expect(getTrackingStageIconToken('UNKNOWN_STAGE')).toBe('default');
+  it('assigns icon tokens based on stage title keywords', () => {
+    expect(getTrackingStageIconToken('Order confirmed')).toBe('confirm');
+    expect(getTrackingStageIconToken('CAM programming')).toBe('design');
+    expect(getTrackingStageIconToken('Quality inspection')).toBe('approval');
     expect(getTrackingStageIconToken('CNC machining')).toBe('process');
-    expect(getTrackingStageIconToken('Shipped / delivered')).toBe('delivery');
+    expect(getTrackingStageIconToken('Packaging')).toBe('packaging');
+    expect(getTrackingStageIconToken('Out for delivery')).toBe('delivery');
+    expect(getTrackingStageIconToken('Arrived at warehouse')).toBe('arrived');
+    expect(getTrackingStageIconToken('Completed')).toBe('completed');
+    expect(getTrackingStageIconToken('Something else')).toBe('default');
   });
 
-  it('formats tracking code and VAT for display together', () => {
-    expect(formatTrackingIdentifierLine('PRJ-123E4567E89B', 'K123456789')).toBe(
-      'PRJ-123E4567E89B · VAT K123456789',
+  it('formats reference number and VAT for display together', () => {
+    expect(formatTrackingIdentifierLine('PRJ-A1B2C3D4', 'K123456789')).toBe(
+      'PRJ-A1B2C3D4 · VAT K123456789',
     );
-    expect(formatTrackingIdentifierLine('PRJ-123E4567E89B', '')).toBe('PRJ-123E4567E89B');
+    expect(formatTrackingIdentifierLine('PRJ-A1B2C3D4', '')).toBe('PRJ-A1B2C3D4');
   });
 
-  it('formats backend tracking statuses for display', () => {
-    expect(formatTrackingStatusLabel('IN_PROGRESS')).toBe('In Progress');
+  it('formats backend project-request statuses for display', () => {
+    expect(formatTrackingStatusLabel('in-progress')).toBe('In Progress');
     expect(formatTrackingStatusLabel('completed')).toBe('Completed');
-  });
-
-  it('formats backend tracking stages for display', () => {
-    expect(formatTrackingStageLabel('OUT_FOR_DELIVERY')).toBe('Out For Delivery');
+    expect(formatTrackingStatusLabel('new')).toBe('New');
   });
 });

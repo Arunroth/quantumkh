@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { requestFormData, requestJson } from './http';
 import {
   createRequestProject,
+  fetchTelegramLinkStatus,
   uploadRequestProjectFiles,
 } from './requestProjects';
 
@@ -53,5 +54,14 @@ describe('requestProjects API', () => {
       '/request-projects/upload-files',
       expect.any(FormData),
     );
+  });
+
+  it('fetches the Telegram opt-in link status for a project request', async () => {
+    vi.mocked(requestJson).mockResolvedValue({ linked: true });
+
+    const result = await fetchTelegramLinkStatus('request-1');
+
+    expect(requestJson).toHaveBeenCalledWith('/api/v1/project-requests/request-1/telegram-status');
+    expect(result).toEqual({ linked: true });
   });
 });

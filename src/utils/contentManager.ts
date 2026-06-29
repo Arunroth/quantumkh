@@ -2,7 +2,6 @@ import servicesData from '../data/services.json';
 import machinesData from '../data/machines.json';
 import projectsData from '../data/projects.json';
 import clientsData from '../data/clients.json';
-import trackingProjectsData from '../data/tracking.json';
 import heroData from '../data/hero.json';
 import featuresData from '../data/features.json';
 import {supabase} from './supabase';
@@ -49,33 +48,6 @@ export interface RequestProjectFormData {
     shoppingLocation?: string;
     specialRequirements?: string;
 };
-
-export enum ProjectStatusEnum {
-    QUEUED = 'queued',
-    IN_PROGRESS = 'in-progress',
-    COMPLETED = 'completed',
-}
-
-export interface ProjectStage {
-    id?: string;
-    projectid: string;
-    name: string;
-    date?: string;
-    status?: string;
-}
-
-export interface ProjectStatus {
-    id: string;
-    projectid: string;
-    vat: string;
-    name: string;
-    status: string;
-    stage: string;
-    startdate: string;
-    estimatedcompletion: string;
-    progress: number;
-    stages?: ProjectStage[]
-}
 
 export interface Hero {
     id?: string;
@@ -142,7 +114,6 @@ class ContentManager {
     private machines: Machine[] = machinesData.machines;
     private projects: Project[] = projectsData.projects;
     private clients: Client[] = clientsData.clients;
-    private projectStatus: ProjectStatus[] = trackingProjectsData.projects;
     private readonly API_BASE_URL: string;
 
     constructor() {
@@ -465,215 +436,6 @@ class ContentManager {
         }
 
         return this.clients.sort((a, b) => a.range - b.range);
-    }
-
-    async getProjectStatus(): Promise<ProjectStatus[]> {
-        const {data, error} = await supabase
-            .from('project_status')
-            .select(`*`)
-
-        if (error) {
-            console.error('Error fetching project status by ID:', error);
-            return [];
-        }
-        this.projectStatus = data as ProjectStatus[];
-
-        await this.getProjectStagesByProjectId(this.projectStatus.map(status => status.id));
-
-        return this.projectStatus;
-    }
-
-    async deleteStage(id: string): Promise<boolean> {
-        const {error} = await supabase
-            .from('project_stages')
-            .delete()
-            .eq('id', id);
-
-        if (error) {
-            console.error('Error deleting stage:', error);
-        }
-        return true;
-    }
-
-    async getProjectStagesByProjectId(projectids: string[]): Promise<ProjectStatus[]> {
-        const {data: stages, error: stageEror} = await supabase
-            .from('project_stages')
-            .select(`*`)
-            .in('projectid', projectids)
-
-        if (stageEror) {
-            console.error('Error fetching project status by ID:', stageEror);
-            return this.projectStatus;
-        }
-
-        // Manually join the data
-        this.projectStatus = this.projectStatus.map(status => ({
-            ...status,
-            stages: stages.filter(stage => stage.projectid === status.id).sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime())
-        }));
-
-        return this.projectStatus;
-    }
-
-    async getProjectStatusById(ids: string): Promise<ProjectStatus[]> {
-        const req = ids.split(',');
-        if (req.length != 2) {
-            return [];
-        }
-        const {data, error} = await supabase
-            .from('project_status')
-            .select('*')
-            .eq('projectid', req[0].trim())
-            .eq('vat', req[1].trim());
-
-        if (error) {
-            console.error('Error fetching project status by ID:', error);
-            return [];
-        }
-        this.projectStatus = data as ProjectStatus[];
-
-        await this.getProjectStagesByProjectId(this.projectStatus.map(status => status.id));
-
-        return this.projectStatus;
-    }
-
-    /**
-     * Look up a tracking row by public identify number + VAT without mutating the in-memory list.
-     */
-    async lookupTrackingByIdentifyAndVat(
-        projectId: string,
-        vat: string,
-    ): Promise<ProjectStatus | null> {
-        const pid = projectId.trim().toUpperCase();
-        const v = vat.trim().toUpperCase();
-        if (!pid || !v) return null;
-        const {data, error} = await supabase
-            .from('project_status')
-            .select('*')
-            .eq('projectid', pid)
-            .eq('vat', v)
-            .limit(1);
-        if (error || !data?.length) {
-            if (error) console.error('Error looking up tracking:', error);
-            return null;
-        }
-        const row = data[0] as ProjectStatus;
-        const {data: stages} = await supabase
-            .from('project_stages')
-            .select('*')
-            .eq('projectid', row.id);
-        return {...row, stages: (stages as ProjectStage[]) || []};
-    }
-
-    async addProjectStatus(projectStatus: Omit<ProjectStatus, "id">): Promise<ProjectStatus[]> {
-        const trimmedPid = (projectStatus.projectid || '').trim();
-        const projectid = trimmedPid
-            ? trimmedPid.toUpperCase()
-            : `PJR${Math.floor(1000 + Math.random() * 9000)}`;
-        const vat = (projectStatus.vat || '').trim().toUpperCase();
-        const newData = {
-            ...projectStatus,
-            projectid,
-            vat,
-        };
-        delete newData.stages;
-        const {data, error} = await supabase
-            .from('project_status')
-            .insert([newData]).select();
-
-        if (error) {
-            console.error('Error creating project status:', error);
-            throw new Error(error.message || 'Failed to create tracking project');
-        }
-        const row = data![0] as ProjectStatus;
-        const stagePayload = {
-            projectid: row.id,
-            name: row.stage,
-            date: row.startdate,
-        };
-        const {data: stageInserted, error: stageErr} = await supabase
-            .from('project_stages')
-            .insert([stagePayload])
-            .select();
-        if (stageErr) {
-            console.error('Error creating initial project stage:', stageErr);
-        }
-        const withStages: ProjectStatus = {
-            ...row,
-            stages: stageInserted?.[0] ? [stageInserted[0] as ProjectStage] : [],
-        };
-        this.projectStatus.push(withStages);
-        return this.projectStatus;
-    }
-
-
-    async updateProjectStatus(id: string, updatedStatus: ProjectStatus, stages: ProjectStage[]): Promise<ProjectStatus | null> {
-        const dataUpdateStatus = {
-            ...updatedStatus,
-            vat: updatedStatus.vat ? updatedStatus.vat.toUpperCase() : "",
-            projectid: updatedStatus.projectid ? updatedStatus.projectid.toUpperCase() : "",
-        }
-        delete dataUpdateStatus.stages;
-        const {error} = await supabase
-            .from('project_status')
-            .update(dataUpdateStatus)
-            .eq('id', id);
-
-        const updatedStages: ProjectStage[] = [];
-        if (stages) {
-            for (const stage of stages) {
-                if (stage.id == "" || stage.id == undefined) {
-                    const {data, error} = await supabase.from('project_stages').insert(stage).select();
-                    if (error) {
-                        console.error('Error adding project stage:', error);
-                        throw new Error(error.message);
-                    }
-                    if (data && data.length > 0) {
-                        updatedStages.push(data[0] as ProjectStage);
-                    }
-                } else {
-                    const {data: updatedStage, error} = await supabase
-                        .from('project_stages')
-                        .update(stage)
-                        .eq('id', stage.id).select();
-                    if (error) {
-                        console.error('Error updating project stage:', error);
-                        throw new Error(error.message);
-                    }
-                    if (updatedStage && updatedStage.length > 0) {
-                        updatedStages.push(updatedStage[0] as ProjectStage);
-                    }
-                }
-            }
-        }
-
-        updatedStatus.stages = updatedStages;
-
-        if (error) {
-            console.error('Error updating project status:', error);
-            return null;
-        }
-        const index = this.projectStatus.findIndex(p => p.id === id);
-        if (index === -1) return null;
-
-        this.projectStatus[index] = {...this.projectStatus[index], ...updatedStatus};
-        return this.projectStatus[index];
-    }
-
-    async deleteProjectStatus(id: string): Promise<boolean> {
-        const {error} = await supabase
-            .from('project_status')
-            .delete()
-            .eq('id', id);
-
-        if (error) {
-            console.error('Error deleting project tracking:', error);
-        }
-        const index = this.projectStatus.findIndex(p => p.id === id);
-        if (index === -1) return false;
-
-        this.projectStatus.splice(index, 1);
-        return true;
     }
 
     async getRequestProjects(): Promise<ResponseProject[]> {

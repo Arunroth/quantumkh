@@ -11,7 +11,7 @@ export default function Navbar() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="bg-white/80 dark:bg-dark-900/80 backdrop-blur-md fixed w-full z-50 shadow-sm transition-colors">
+    <nav className="bg-white/70 dark:bg-dark-900/70 backdrop-blur-md fixed w-full z-50 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-2 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center">

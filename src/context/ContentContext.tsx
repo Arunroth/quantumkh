@@ -6,8 +6,6 @@ import {
     Hero,
     Machine,
     Project,
-    ProjectStage,
-    ProjectStatus,
     Service,
 } from "../utils/contentManager";
 
@@ -34,15 +32,6 @@ interface ContentContextType {
     addClient: (client: Omit<Client, "id">) => Promise<Client[]>;
     updateClient: (id: string, client: Partial<Client>) => Promise<Client[]>;
     deleteClient: (id: string) => Promise<Client[]>;
-    searchProjectStatus: (ids: string) => Promise<ProjectStatus[]>;
-    projectStatus: ProjectStatus[];
-    addProjectStatus: (projectStatus: Omit<ProjectStatus, "id">) => Promise<void>;
-    updateProjectStatus: (
-        id: string,
-        updatedStatus: ProjectStatus,
-        stages: ProjectStage[]
-    ) => Promise<ProjectStatus | null>;
-    deleteProjectStatus: (id: string) => void;
     isLoading: boolean;
 }
 
@@ -73,7 +62,6 @@ export function ContentProvider({children}: { children: ReactNode }) {
     const [machines, setMachines] = useState<Machine[]>([]);
     const [projects, setProjects] = useState<Project[]>([]);
     const [clients, setClients] = useState<Client[]>([]);
-    const [projectStatus, setProjectStatus] = useState<ProjectStatus[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -87,7 +75,6 @@ export function ContentProvider({children}: { children: ReactNode }) {
                     machinesData,
                     projectsData,
                     featuresData,
-                    projectStatusData
                 ] = await Promise.all([
                     withFallback(contentManager.getHero(), hero),
                     withFallback(contentManager.getClients(), clients),
@@ -95,7 +82,6 @@ export function ContentProvider({children}: { children: ReactNode }) {
                     withFallback(contentManager.getMachines(), machines),
                     withFallback(contentManager.getProjects(), projects),
                     withFallback(contentManager.getFeatures(), features),
-                    withFallback(contentManager.getProjectStatus(), projectStatus),
                 ]);
 
                 setHero(heroData);
@@ -104,7 +90,6 @@ export function ContentProvider({children}: { children: ReactNode }) {
                 setMachines(machinesData);
                 setProjects(projectsData);
                 setFeatures(featuresData);
-                setProjectStatus(projectStatusData);
             } catch (error) {
                 console.error("Error fetching data:", error);
             } finally {
@@ -216,33 +201,6 @@ export function ContentProvider({children}: { children: ReactNode }) {
         return data;
     };
 
-    const searchProjectStatus = async (ids: string) => {
-        return await contentManager.getProjectStatusById(ids);
-    };
-
-    const addProjectStatus = async (projectStatus: Omit<ProjectStatus, "id">) => {
-        const data = await contentManager.addProjectStatus(projectStatus);
-        setProjectStatus([...data]);
-    };
-
-    const updateProjectStatus = async (
-        id: string,
-        updatedStatus: ProjectStatus,
-        stages: ProjectStage[]
-    ) => {
-        const data = await contentManager.updateProjectStatus(id, updatedStatus, stages);
-        if (data) {
-            setProjectStatus((prev) => prev.map((p) => (p.id === id ? data : p)));
-        }
-        return data;
-    };
-
-    const deleteProjectStatus = async (id: string) => {
-        if (await contentManager.deleteProjectStatus(id)) {
-            setProjectStatus(projectStatus.filter((p) => p.id !== id));
-        }
-    };
-
     return (
         <ContentContext.Provider
             value={{
@@ -268,11 +226,6 @@ export function ContentProvider({children}: { children: ReactNode }) {
                 addClient,
                 updateClient,
                 deleteClient,
-                projectStatus,
-                searchProjectStatus,
-                addProjectStatus,
-                updateProjectStatus,
-                deleteProjectStatus,
                 isLoading,
             }}
         >

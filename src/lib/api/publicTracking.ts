@@ -7,11 +7,12 @@ import { requestJson } from './http.ts';
 export async function lookupPublicProjectTracking(
   payload: PublicProjectTrackingLookupInput,
 ): Promise<PublicProjectTrackingResponse> {
+  const params = new URLSearchParams({
+    reference_no: payload.referenceNo,
+    vat: payload.vat,
+  });
+
   return requestJson<PublicProjectTrackingResponse>(
-    '/client-portal/public/project-lookup',
-    {
-      method: 'POST',
-      body: payload,
-    },
+    `/api/v1/project-requests/track?${params.toString()}`,
   );
 }

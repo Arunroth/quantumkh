@@ -62,3 +62,8 @@ export function getEnumValue<T extends Record<string, string>>(enumObj: T, key?:
 }
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://quantumkh-api.fifty-point.com';
+
+// Username (without "@") of the Telegram bot customers connect to for project
+// update notifications. Leave VITE_TELEGRAM_BOT_USERNAME unset to hide the
+// "Connect Telegram" opt-in on the request-success screen.
+export const TELEGRAM_BOT_USERNAME = import.meta.env.VITE_TELEGRAM_BOT_USERNAME || '';

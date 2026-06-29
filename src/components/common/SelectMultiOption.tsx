@@ -19,6 +19,7 @@ const SelectOptionReactSelect: React.FC<SelectMultiCustomProps> = ({
                                                                    }) => {
     const [selectedOptions, setSelectedOptions] = useState<MultiValue<SelectOption>>([]);
     const [otherValue, setOtherValue] = useState<string>('');
+    const [otherTouched, setOtherTouched] = useState(false);
 
     // Sync local state with form value when it changes
     useEffect(() => {
@@ -58,6 +59,7 @@ const SelectOptionReactSelect: React.FC<SelectMultiCustomProps> = ({
 
         if (!newValue.some((opt) => opt.value === 'Other')) {
             setOtherValue('');
+            setOtherTouched(false);
         }
     };
 
@@ -192,9 +194,17 @@ const SelectOptionReactSelect: React.FC<SelectMultiCustomProps> = ({
                         type="text"
                         value={otherValue}
                         onChange={handleOtherInputChange}
-                        placeholder="Please specify"
-                        className="block p-2.5 w-full text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-yellow-300 focus:shadow-outline placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-gray-100 transition duration-300 ease focus:shadow-md"
+                        onBlur={() => setOtherTouched(true)}
+                        placeholder="Please specify *"
+                        className={`block p-2.5 w-full text-sm bg-white dark:bg-gray-700 border rounded-md focus:outline-yellow-300 focus:shadow-outline placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-gray-100 transition duration-300 ease focus:shadow-md ${
+                            otherTouched && !otherValue
+                                ? 'border-red-500 dark:border-red-500'
+                                : 'border-gray-300 dark:border-gray-600'
+                        }`}
                     />
+                    {otherTouched && !otherValue && (
+                        <p className="mt-1 text-red-500 text-xs">Please specify your custom material</p>
+                    )}
                 </div>
             )}
         </div>

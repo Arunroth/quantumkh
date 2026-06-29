@@ -12,17 +12,13 @@ export function formatTrackingStatusLabel(status: string): string {
   return humanizeToken(status);
 }
 
-export function formatTrackingStageLabel(stage: string): string {
-  return humanizeToken(stage);
-}
-
-export function formatTrackingIdentifierLine(projectId: string, vat?: string | null): string {
-  const normalizedProjectId = String(projectId || '').trim();
+export function formatTrackingIdentifierLine(referenceNo: string, vat?: string | null): string {
+  const normalizedReferenceNo = String(referenceNo || '').trim();
   const normalizedVat = String(vat || '').trim();
-  return normalizedVat ? `${normalizedProjectId} · VAT ${normalizedVat}` : normalizedProjectId;
+  return normalizedVat ? `${normalizedReferenceNo} · VAT ${normalizedVat}` : normalizedReferenceNo;
 }
 
-export function getTrackingStageIconToken(stage: string):
+export function getTrackingStageIconToken(title: string):
   | 'confirm'
   | 'design'
   | 'approval'
@@ -32,32 +28,11 @@ export function getTrackingStageIconToken(stage: string):
   | 'arrived'
   | 'completed'
   | 'default' {
-  const key = String(stage || '').trim().toUpperCase();
-  switch (key) {
-    case 'CONFIRM':
-      return 'confirm';
-    case 'DESIGN_CONFIRM':
-      return 'design';
-    case 'MATERIAL_APPROVAL':
-      return 'approval';
-    case 'CUSTOM_PROCESS':
-      return 'process';
-    case 'PACKAGING':
-      return 'packaging';
-    case 'OUT_FOR_DELIVERY':
-      return 'delivery';
-    case 'ARRIVED':
-      return 'arrived';
-    case 'COMPLETED':
-      return 'completed';
-    default:
-      break;
-  }
-  const s = String(stage || '').toLowerCase();
-  if (/\bfile\b|review|intake/.test(s)) return 'confirm';
+  const s = String(title || '').toLowerCase();
+  if (/\bfile\b|review|intake|confirm/.test(s)) return 'confirm';
   if (/cam|program|design/.test(s)) return 'design';
   if (/quality|qc|inspect|approval/.test(s)) return 'approval';
-  if (/cnc|machin|mill|turn|process/.test(s)) return 'process';
+  if (/cnc|machin|mill|turn|process|cutting/.test(s)) return 'process';
   if (/finish|coat|surface/.test(s)) return 'design';
   if (/pack/.test(s)) return 'packaging';
   if (/ship|deliver|freight/.test(s)) return 'delivery';

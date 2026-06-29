@@ -4,7 +4,6 @@ import {FileText, LayoutDashboard, LogOut, Package, PaintBucket} from 'lucide-re
 const navigation = [
     {name: 'Dashboard', href: '/admin', icon: LayoutDashboard},
     {name: 'Content', href: '/admin/content', icon: FileText},
-    {name: 'Projects', href: '/admin/projects', icon: PaintBucket},
     {name: 'Services', href: '/admin/services', icon: Package},
 ];
 

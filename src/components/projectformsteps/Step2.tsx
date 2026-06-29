@@ -6,7 +6,7 @@ import {RequestProjectFormData} from "../../lib/types/requestProjects.ts";
 import {getOptions, ServiceTypes} from "../../utils/serviceManageer.ts";
 
 const schema = z.object({
-    projectName: z.string(),
+    projectName: z.string().min(1, "Please enter a project name"),
     projectType: z.string().min(1, "Please select a project type"),
     projectDescription: z.string().min(1, "Please input the description for more details").max(2000, "Description is too long"),
 });
@@ -41,6 +41,7 @@ export default function Step2({onNext, onBack, formData}: {
                 <p className="text-gray-500 dark:text-gray-300">Choose a project type that suits your needs.</p>
 
                 <InputCustom
+                    isRequired
                     label="Project Name / Reference"
                     errors={errors}
                     name="projectName"

@@ -1,11 +1,18 @@
 export interface RequestProjectFileReference {
-  originalFilename: string;
+  original_filename: string;
   filename: string;
+}
+
+export interface PricingOption {
+  id: string;
+  name: string;
 }
 
 export interface RequestProjectFormData {
   name: string;
+  isCompany?: string | boolean;
   companyName?: string;
+  vat?: string;
   email: string;
   phone: string;
   contactMethod: string;
@@ -28,6 +35,12 @@ export interface RequestProjectFormData {
 export interface RequestProjectCreatedResponse {
   id: string;
   rfqId?: string;
+  reference_no?: string;
+  vat?: string | null;
   createdAt: string;
   status: string;
+}
+
+export interface TelegramLinkStatus {
+  linked: boolean;
 }

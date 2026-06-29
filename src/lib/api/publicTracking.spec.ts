@@ -8,30 +8,41 @@ vi.mock('./http', () => ({
 }));
 
 describe('publicTracking API', () => {
-  it('posts project and VAT identifiers to the public lookup endpoint', async () => {
+  it('looks up a project by reference number and VAT', async () => {
     vi.mocked(requestJson).mockResolvedValue({
-      projectId: 'PRJ001',
+      referenceNo: 'PRJ-A1B2C3D4',
       projectName: 'Laser Jig',
-      status: 'IN_PROGRESS',
-      clientTrackingStage: 'PACKAGING',
-      updates: [],
+      status: 'in-progress',
+      createdAt: '2026-03-17T00:00:00.000Z',
       stages: [],
     });
 
     await lookupPublicProjectTracking({
-      projectId: 'PRJ001',
+      referenceNo: 'PRJ-A1B2C3D4',
       vat: 'K123456789',
     });
 
     expect(requestJson).toHaveBeenCalledWith(
-      '/client-portal/public/project-lookup',
-      {
-        method: 'POST',
-        body: {
-          projectId: 'PRJ001',
-          vat: 'K123456789',
-        },
-      },
+      '/api/v1/project-requests/track?reference_no=PRJ-A1B2C3D4&vat=K123456789',
+    );
+  });
+
+  it('looks up a project without a VAT (individual customers)', async () => {
+    vi.mocked(requestJson).mockResolvedValue({
+      referenceNo: 'PRJ-A1B2C3D4',
+      projectName: 'Laser Jig',
+      status: 'new',
+      createdAt: '2026-03-17T00:00:00.000Z',
+      stages: [],
+    });
+
+    await lookupPublicProjectTracking({
+      referenceNo: 'PRJ-A1B2C3D4',
+      vat: '',
+    });
+
+    expect(requestJson).toHaveBeenCalledWith(
+      '/api/v1/project-requests/track?reference_no=PRJ-A1B2C3D4&vat=',
     );
   });
 });

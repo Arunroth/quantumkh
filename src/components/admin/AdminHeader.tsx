@@ -1,4 +1,4 @@
-import { Bell, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import ThemeToggle from '../ThemeToggle';
 
 export default function AdminHeader() {
@@ -20,10 +20,6 @@ export default function AdminHeader() {
           </div>
           <div className="flex items-center space-x-4">
             <ThemeToggle />
-            <button className="relative p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500">
-              <Bell className="h-6 w-6" />
-              <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-primary-500"></span>
-            </button>
           </div>
         </div>
       </div>
