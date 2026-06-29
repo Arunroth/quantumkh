@@ -64,7 +64,7 @@ export default function LoadingScreen() {
                     <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24">
                         <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-800 dark:to-dark-900 h-3/4 animate-pulse opacity-50 -z-10" />
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                            <div className="space-y-6">
+                            <div className="space-y-6 order-2 lg:order-1">
                                 <div className="space-y-3">
                                     <div className="h-12 w-3/4 bg-gray-200 dark:bg-dark-700 rounded-lg animate-pulse" />
                                     <div className="h-12 w-2/3 bg-gray-200 dark:bg-dark-700 rounded-lg animate-pulse delay-75" />
@@ -78,7 +78,7 @@ export default function LoadingScreen() {
                                     <div className="h-12 w-40 bg-gray-200 dark:bg-dark-700 rounded-lg animate-pulse delay-200" />
                                 </div>
                             </div>
-                            <div className="relative h-[400px] w-full bg-gray-200 dark:bg-dark-700 rounded-lg shadow-xl animate-pulse delay-150" />
+                            <div className="relative order-1 lg:order-2 h-[400px] w-full bg-gray-200 dark:bg-dark-700 rounded-lg shadow-xl animate-pulse delay-150" />
                         </div>
                     </div>
                 )}
