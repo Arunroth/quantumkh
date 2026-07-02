@@ -112,9 +112,9 @@ const SuccessMessage: React.FC<SuccessMessageProps> = ({ onReset, submission, co
                     </p>
                 )}
 
-                {contactMethod === ContactMethods.Telegram && submission?.id && (
+                {/* {contactMethod === ContactMethods.Telegram && submission?.id && (
                     <TelegramOptIn requestId={submission.id} />
-                )}
+                )} */}
 
                 <button
                     onClick={onReset}
